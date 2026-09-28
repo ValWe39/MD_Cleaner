@@ -1,9 +1,9 @@
 <!--
-Sync Impact Report - Constitution v1.0.0
+Sync Impact Report - Constitution v1.3.0
 =========================================
-Version change: [empty template] -> 1.0.0 (MAJOR: initial adoption)
-Added sections: Core Principles, Security & Privacy Requirements, Development Workflow, Additional Requirements, Governance
-Modified principles: N/A (initial creation)
+Version change: 1.0.0 -> 1.3.0 (MINOR: 3 amendments added)
+Added sections: Amendments (1-3), Automated Compliance Checks in Development Workflow
+Modified principles: N/A
 Removed sections: N/A
 Follow-up TODOs: None
 -->
@@ -60,6 +60,15 @@ Le tool doit valider au lancement que la configuration et les chemins requis son
 ### Commit Hygiene
 Avant tout commit, vérification qu'aucune clé réelle ni chemin personnel n'est dans le diff. Le .gitignore doit couvrir les configs locales et répertoires de sortie.
 
+### Automated Compliance Checks
+Un workflow GitHub Actions (`diagnostic.yml`) vérifie automatiquement la conformité à cette constitution sur chaque `push`, `pull_request` et via un cron hebdomadaire.
+- **Job `constitution-compliance`** : Vérifie les principes I et II (secrets, local-first) en mode fail-fast.
+- **Job `secrets`** : Détecte les fuites de secrets avec Gitleaks v8.21.2 (MIT).
+- **Job `lint`** : Applique Ruff v0.16.8 (MIT) et markdownlint-cli2 (MIT) pour le style de code.
+- **Job `workflows-security`** : Audite les workflows avec Zizmor (Apache-2.0) et actionlint v1.7.3 (MIT).
+- **Job `audit`** (hebdomadaire) : Scanne les vulnérabilités avec Trivy (Apache-2.0) et pip-audit (MIT).
+Tous les outils sont open-source (conforme à III) et s'exécutent sans transmettre de données utilisateur (conforme à II).
+
 ## Additional Requirements
 
 ### Sovereign Tools Preference
@@ -69,4 +78,74 @@ Les outils et packages utilisés doivent, dans la mesure du possible, être souv
 
 La Constitution prime sur toutes les autres pratiques et documents du projet. Tout amendement doit être documenté, approuvé et accompagné d'un plan de migration si nécessaire. La compliance avec cette Constitution doit être vérifiée pour chaque PR et review. Les principes marqués NON NÉGOCIABLE ne peuvent être modifiés qu'avec l'accord unanime de tous les mainteneurs.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-28 | **Last Amended**: 2026-09-28
+## Amendments
+
+### Amendment 1 — GitHub Token pour l'audit de sécurité des workflows
+
+**Date** : 2026-09-28 | **Status** : Ratified
+
+**Modification** :
+L'usage de `secrets.GITHUB_TOKEN` est **explicitement permis** pour le seul but d'exécuter **Zizmor** dans un job dédié du workflow GitHub Actions, sous les conditions strictes suivantes :
+
+- **Purpose** : Uniquement pour auditer la sécurité des fichiers workflows (ex: `.github/workflows/*.yml`).
+- **Scope** : Le token doit être restreint à **`contents: read`** et aucune autre permission.
+- **No Data Transmission** : Le token ne doit **pas** transmettre de données utilisateur, de contenus traités par MD_Cleaner, ou d'informations personnelles à GitHub ou tout tiers.
+- **Tool Limitation** : Seul Zizmor (open-source, Apache-2.0) peut utiliser ce token. Aucun autre outil, script ou étape de workflow.
+- **Audit Trail** : Toutes les utilisations du token doivent être loguées dans la sortie du workflow, et le workflow doit échouer si le token est utilisé à d'autres fins.
+
+**Rationale** :
+L'audit de sécurité des workflows est un **contrôle critique** pour appliquer les principes **I** (Isolation des secrets) et **II** (Local-first & confidentialité) au niveau CI/CD. Zizmor nécessite des permissions minimales (`contents: read`) pour analyser les fichiers workflows sans exposer de données utilisateur ni violer le principe Local-first.
+
+**Previous Version** : 1.0.0 | **New Version** : 1.1.0
+
+---
+
+### Amendment 2 — Appels réseau pour les outils CI/CD
+
+**Date** : 2026-09-28 | **Status** : Ratified
+
+**Modification** :
+Les appels réseau sortants sont **explicitement permis** pour télécharger des outils open-source CI/CD pendant l'exécution du workflow, sous les conditions strictes suivantes :
+
+- **Purpose** : Uniquement pour installer les outils requis par le workflow `diagnostic.yml`.
+- **Authorized Tools** : Limités à **`npm`**, **`curl`**, **`pip`**, **`pipx`** pour télécharger les outils suivants :
+  - `markdownlint-cli2` (MIT, via npm)
+  - `gitleaks` (MIT, via curl)
+  - `ruff` (MIT, via pip/pipx)
+  - `zizmor` (Apache-2.0, via pipx)
+  - `actionlint` (MIT, via curl)
+  - `trivy` (Apache-2.0, via curl)
+  - `pip-audit` (MIT, via pipx)
+- **Scope** : Limité au workflow `diagnostic.yml` et à ses étapes.
+- **No Data Transmission** : Ces appels ne doivent **pas** transmettre de données utilisateur, de contenus traités par MD_Cleaner, ou d'informations personnelles.
+- **No Trackers** : Tous les outils téléchargés doivent être open-source, sans trackers ni télémétrie intégrés.
+
+**Rationale** :
+Les workflows CI/CD nécessitent des outils externes pour l'audit de sécurité (Gitleaks, Trivy), le linting (Ruff, markdownlint-cli2) et l'audit des dépendances (pip-audit). Ces outils sont **essentiels** pour appliquer les principes **I** (Isolation des secrets), **III** (Open-source) et les exigences de qualité. Les appels réseau sont isolés à l'environnement CI, utilisent uniquement des outils open-source autorisés, et ne transmettent pas de données utilisateur, respectant ainsi les principes fondamentaux du projet.
+
+**Previous Version** : 1.1.0 | **New Version** : 1.2.0
+
+---
+
+### Amendment 3 — Vérifications automatisées de conformité
+
+**Date** : 2026-09-28 | **Status** : Ratified
+
+**Modification** :
+Un workflow GitHub Actions (`diagnostic.yml`) est **explicitement autorisé** pour vérifier automatiquement la conformité à cette constitution, sous les conditions suivantes :
+
+- **Déclencheurs** : Exécution sur `push` (branche `main`), `pull_request`, et via un cron hebdomadaire (`0 6 * * 1`).
+- **Jobs** :
+  - `constitution-compliance` : Vérifie les principes **I** et **II** (secrets, local-first) en mode **fail-fast**.
+  - `secrets` : Détecte les fuites de secrets avec Gitleaks v8.21.2.
+  - `lint` : Applique Ruff v0.16.8 et markdownlint-cli2 pour le style de code.
+  - `workflows-security` : Audite les workflows avec Zizmor et actionlint v1.7.3.
+  - `audit` (hebdomadaire) : Scanne les vulnérabilités avec Trivy et pip-audit.
+- **Scope** : Tous les outils utilisés sont open-source (conforme à **III**) et s'exécutent sans transmettre de données utilisateur (conforme à **II**).
+
+**Rationale** :
+L'automatisation de la conformité **renforce la gouvernance** (section Governance : "La compliance [...] doit être vérifiée pour chaque PR"). Ce workflow applique les principes **I** et **II** au niveau CI/CD, en complément des vérifications locales.
+
+**Previous Version** : 1.2.0 | **New Version** : 1.3.0
+
+**Version**: 1.3.0 | **Ratified**: 2026-09-28 | **Last Amended**: 2026-09-28
