@@ -148,4 +148,34 @@ L'automatisation de la conformité **renforce la gouvernance** (section Governan
 
 **Previous Version** : 1.2.0 | **New Version** : 1.3.0
 
-**Version**: 1.3.0 | **Ratified**: 2026-09-28 | **Last Amended**: 2026-09-28
+---
+
+### Amendment 4 — Hooks Pre-commit pour validation locale
+
+**Date** : 2026-09-28 | **Status** : Ratified
+
+**Modification** :
+L'usage de **pre-commit** (open-source, MIT) est **explicitement permis** pour le développement local, sous les conditions strictes suivantes :
+
+- **Purpose** : Uniquement pour exécuter des **hooks locaux** afin d'appliquer les principes **I** et **II** avant tout commit.
+- **Authorized Remote Hooks** : Seuls les dépôts open-source suivants sont autorisés :
+  - `https://github.com/gitleaks/gitleaks` (MIT) — détection de secrets.
+  - `https://github.com/astral-sh/ruff-pre-commit` (MIT) — linting et formatage Python.
+  - `https://github.com/DavidAnson/markdownlint-cli2` (MIT) — linting Markdown.
+- **Scope** : Limité au **développement local** (pas d'exécution dans GitHub Actions ou tout environnement CI distant).
+- **No Data Transmission** : Les hooks ne doivent **pas** transmettre de données utilisateur, de contenus traités par MD_Cleaner, ou d'informations personnelles.
+- **Network Calls** : L'installation initiale des hooks (`pre-commit install`) est autorisée **une seule fois par environnement développeur** pour la configuration. Les exécutions ultérieures utilisent les caches locaux.
+- **Local First** : Tous les hooks doivent s'exécuter **localement** sur la machine du développeur. Aucune exécution dans le cloud n'est permise.
+
+**Local Hooks** :
+- `check_constitution.py --diff HEAD` — vérification des principes I et II.
+- `audit_workflows.py .github/workflows/` — audit des workflows GitHub Actions.
+
+**Rationale** :
+Les hooks pre-commit sont un **contrôle critique** pour appliquer la constitution **au plus tôt** (avant commit). Ils empêchent les secrets, le code non conforme ou les appels réseau non autorisés d'entrer dans l'historique du dépôt. En autorisant ces hooks open-source, les développeurs valident la conformité localement, réduisant le risque de violations des principes **I** ou **II** dans le dépôt distant. L'appel réseau unique pour l'installation initiale est un compromis nécessaire pour une validation locale robuste, aligné avec l'approche sécurité d'abord du projet.
+
+**Previous Version** : 1.3.0 | **New Version** : 1.4.0
+
+---
+
+**Version**: 1.4.0 | **Ratified**: 2026-09-28 | **Last Amended**: 2026-09-28
