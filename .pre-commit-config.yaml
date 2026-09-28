@@ -33,8 +33,9 @@ repos:
       - id: markdownlint-cli2
         args: [
           '**/*.md',
-          '!**/.github/**',
+          '!**/.github/workflows/**',
           '!**/.specify/**',
+          '**/.specify/memory/**',
           '!**/input/**',
           '!**/output/**',
           '!**/Prompts/**',
