@@ -101,12 +101,12 @@ jobs:
       - name: Lint Markdown (exclusions input output Prompts .vibe .github/workflows Licence)
         run: |
           markdownlint-cli2 '**/*.md' \
-            --ignore 'input/**' \
-            --ignore 'output/**' \
-            --ignore 'Prompts/**' \
-            --ignore '.vibe/**' \
-            --ignore '.github/workflows/**' \
-            --ignore 'Licence'
+            '!input/**' \
+            '!output/**' \
+            '!Prompts/**' \
+            '!.vibe/**' \
+            '!.github/workflows/**' \
+            '!Licence'
 
   # --- Job 4 : Audit de sécurité des workflows ---
   workflows-security:
