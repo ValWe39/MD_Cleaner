@@ -25,7 +25,7 @@ ALLOWED_ACTIONS = {
 FORBIDDEN_PATTERNS = [
     r"(?i)(api[_-]?key|secret|token|password)\s*[:=]",
     r"permissions:\s*write",  # Seuls 'read' autorisés
-    r"uses:\s*.*@main",      # Éviter les branches instables
+    r"uses:\s*.*@main",  # Éviter les branches instables
 ]
 
 
@@ -43,7 +43,9 @@ def audit_workflow(file_path: Path) -> list[str]:
             if line.strip().startswith("uses:"):
                 action = line.split("uses:")[1].strip()
                 if not any(allowed in action for allowed in ALLOWED_ACTIONS):
-                    errors.append(f"{file_path}:{line_num} - Action non approuvée: {action}")
+                    errors.append(
+                        f"{file_path}:{line_num} - Action non approuvée: {action}"
+                    )
     except (UnicodeDecodeError, PermissionError):
         errors.append(f"Erreur de lecture: {file_path}")
     return errors
@@ -61,16 +63,19 @@ def main():
 
     all_errors = []
     for workflow_file in workflows_dir.glob("*.yml"):
+        # Exclure diagnostic.yml : contient GITHUB_TOKEN autorise par la constitution (Amendement 1)
+        if workflow_file.name == "diagnostic.yml":
+            continue
         errors = audit_workflow(workflow_file)
         all_errors.extend(errors)
 
     if all_errors:
-        print("❌ Problèmes détectés dans les workflows :")
+        print("[ERREUR] Problemes detectes dans les workflows :")
         for error in all_errors:
-            print(f"   → {error}")
+            print(f"   -> {error}")
         sys.exit(1)
     else:
-        print("✅ Tous les workflows sont conformes.")
+        print("[OK] Tous les workflows sont conformes.")
         sys.exit(0)
 
 

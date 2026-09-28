@@ -84,7 +84,7 @@ jobs:
           set -euo pipefail
           pipx install ruff==0.16.8
 
-      - name: Lint Python (exclu : input/, output/, Prompts/, .vibe/, .specify/, Licence)
+      - name: Lint Python (exclusions input output Prompts .vibe .specify Licence)
         run: |
           set -euo pipefail
           ruff check . --exclude input/ --exclude output/ --exclude Prompts/ --exclude .vibe/ --exclude .specify/ --exclude Licence
@@ -98,7 +98,7 @@ jobs:
       - name: Installer markdownlint-cli2 (autorisé par Amendement 2)
         run: npm install -g markdownlint-cli2
 
-      - name: Lint Markdown (exclu : input/, output/, Prompts/, .vibe/, .specify/, .github/, Licence)
+      - name: Lint Markdown (exclusions input output Prompts .vibe .specify .github Licence)
         run: |
           markdownlint-cli2 '**/*.md' \
             --ignore input/** \
