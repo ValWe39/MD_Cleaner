@@ -57,3 +57,11 @@ repos:
         entry: python .github/workflows/scripts/audit_workflows.py .github/workflows/
         language: system
         always_run: true
+
+
+      - id: check-action-pinning
+        name: Verifier le pinning des actions GitHub
+        entry: python .github/workflows/scripts/check_action_pinning.py
+        language: system
+        always_run: true
+        pass_filenames: false

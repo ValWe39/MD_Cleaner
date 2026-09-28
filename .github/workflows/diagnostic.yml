@@ -21,13 +21,13 @@ jobs:
     name: Conformité constitution (I et II)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
         with:
           fetch-depth: 0  # Nécessaire pour gitleaks et check diff
           persist-credentials: false  # Sécurité renforcée
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@044095e11f1893344439f77639d5f49562b4635f
         with:
           python-version: '3.12'
 
@@ -49,7 +49,7 @@ jobs:
     needs: constitution-compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -70,12 +70,12 @@ jobs:
     needs: constitution-compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
         with:
           persist-credentials: false
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@044095e11f1893344439f77639d5f49562b4635f
         with:
           python-version: '3.12'
 
@@ -91,7 +91,7 @@ jobs:
           ruff format --check . --exclude input/ --exclude output/ --exclude Prompts/ --exclude .vibe/ --exclude .specify/ --exclude Licence
 
       - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@6b6a276955979750998769387535d82754463552
         with:
           node-version: '20'
 
@@ -117,12 +117,12 @@ jobs:
     permissions:
       contents: read  # Conforme à l'Amendement 1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
         with:
           persist-credentials: false
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@044095e11f1893344439f77639d5f49562b4635f
         with:
           python-version: '3.12'
 
@@ -153,12 +153,12 @@ jobs:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
         with:
           persist-credentials: false
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@044095e11f1893344439f77639d5f49562b4635f
         with:
           python-version: '3.12'
 
