@@ -21,13 +21,13 @@ jobs:
     name: Conformité constitution (I et II)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0  # Nécessaire pour gitleaks et check diff
           persist-credentials: false  # Sécurité renforcée
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
 
@@ -49,7 +49,7 @@ jobs:
     needs: constitution-compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -70,12 +70,12 @@ jobs:
     needs: constitution-compliance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
 
@@ -84,21 +84,21 @@ jobs:
           set -euo pipefail
           pipx install ruff==0.16.8
 
-      - name: Lint Python (exclu : input/, output/, Prompts/, .vibe/, .specify/, Licence)
+      - name: Lint Python (exclusions input output Prompts .vibe .specify Licence)
         run: |
           set -euo pipefail
           ruff check . --exclude input/ --exclude output/ --exclude Prompts/ --exclude .vibe/ --exclude .specify/ --exclude Licence
           ruff format --check . --exclude input/ --exclude output/ --exclude Prompts/ --exclude .vibe/ --exclude .specify/ --exclude Licence
 
       - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '20'
 
       - name: Installer markdownlint-cli2 (autorisé par Amendement 2)
         run: npm install -g markdownlint-cli2
 
-      - name: Lint Markdown (exclu : input/, output/, Prompts/, .vibe/, .specify/, .github/, Licence)
+      - name: Lint Markdown (exclusions input output Prompts .vibe .specify .github Licence)
         run: |
           markdownlint-cli2 '**/*.md' \
             --ignore input/** \
@@ -117,12 +117,12 @@ jobs:
     permissions:
       contents: read  # Conforme à l'Amendement 1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
 
@@ -153,12 +153,12 @@ jobs:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
 
