@@ -8,12 +8,13 @@ import re
 import sys
 from pathlib import Path
 
-WORKFLOWS_DIR = Path(".github/workflows")
+# Construit le chemin dynamiquement depuis l'emplacement du script
+WORKFLOWS_DIR = Path(__file__).parent.parent.parent / "workflows"
 
 # Pattern pour detecter une action avec un tag (non pinnee)
 # Exemple: uses: actions/checkout@v4  ou  uses: actions/checkout@main
 NON_PINNED_PATTERN = re.compile(
-    r'uses:\s*[^\s]+@(?!([0-9a-fA-F]{40}|[0-9a-fA-F]{64})\b)'
+    r"uses:\s*[^\s]+@(?!([0-9a-fA-F]{40}|[0-9a-fA-F]{64})\b)"
 )
 
 
@@ -25,10 +26,12 @@ def check_workflow_file(file_path: Path) -> list[str]:
         for line_num, line in enumerate(content.splitlines(), 1):
             if "uses:" in line and NON_PINNED_PATTERN.search(line):
                 # Extraire le nom de l'action
-                match = re.search(r'uses:\s*([^\s#]+)', line)
+                match = re.search(r"uses:\s*([^\s#]+)", line)
                 if match:
                     action_ref = match.group(1)
-                    errors.append(f"{file_path}:{line_num} - Action non pinnee: {action_ref}")
+                    errors.append(
+                        f"{file_path}:{line_num} - Action non pinnee: {action_ref}"
+                    )
     except (UnicodeDecodeError, PermissionError):
         errors.append(f"Erreur de lecture: {file_path}")
     return errors
