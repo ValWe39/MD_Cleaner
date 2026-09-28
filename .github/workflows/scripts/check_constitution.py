@@ -178,8 +178,8 @@ def check_gitignore_coverage() -> list[str]:
 
 
 def check_license_exists() -> list[str]:
-    """Vérifie que le fichier License existe."""
-    return [] if Path("License").exists() else ["Le fichier License est manquant"]
+    """Vérifie que le fichier LICENSE existe."""
+    return [] if Path("LICENSE").exists() else ["Le fichier LICENSE est manquant"]
 
 
 def check_constitution_exists() -> list[str]:
