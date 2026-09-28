@@ -1,0 +1,15 @@
+# Variables d'environnement
+.env
+.env.*
+
+# Dossiers de données input/output
+input/
+output/
+
+# Dossiers à ignorer
+Prompts/
+.vibe/
+
+# Ignorer .specify mais garder memory
+.specify/
+!.specify/memory
