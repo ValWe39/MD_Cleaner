@@ -52,7 +52,7 @@ def is_excluded(file_path: Path) -> bool:
 CLOUD_SERVICES = {
     "aws",
     "amazon",
-    "s3",
+    r"(?<![A-Za-z])s3",  # évite le faux positif « US3 »
     "ec2",
     "lambda",
     "firebas",
