@@ -4,7 +4,9 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^Examples/
       - id: end-of-file-fixer
+        exclude: ^Examples/
       - id: check-yaml
 
   # --- Détection de secrets (équivalent du job `secrets`) ---
@@ -31,6 +33,7 @@ repos:
     rev: v0.15.0
     hooks:
       - id: markdownlint-cli2
+        exclude: ^Examples/
         args: [
           '**/*.md',
           '!**/.github/workflows/**',
@@ -40,6 +43,7 @@ repos:
           '!**/output/**',
           '!**/Prompts/**',
           '!**/.vibe/**',
+          '!**/Examples/**',
           '!Licence'
         ]
 

@@ -10,7 +10,7 @@ output/
 Prompts/
 .vibe/
 
-# Ignorer les sous-dossiers de .specify sauf memory/
-.specify/.vibe/
-.specify/templates/
+# Ignorer le contenu de .specify sauf memory/ (constitution versionnée)
+.specify/*
 !.specify/memory/
+.specify/memory/.*
