@@ -28,9 +28,9 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 **Purpose**: Tests écrits d'abord (TDD) — ils DOIVENT échouer avant implémentation.
 
-- [ ] T001 [P] [US1] Étendre `tests/unit/test_suggestion.py` : enrichissement des motifs — extrait de N lignes exactes quand l'intervalle le permet (FR-001), intervalle plus court rendu tel quel sans complément (cas limite de la spec), vrais sauts de ligne, position `{"page": entier >= 1, "debut": entier >= 0, "fin": entier > debut, inclue}` ancrée sur la première occurrence (FR-002), extrait et position désignant le même endroit (D1, D3)
-- [ ] T002 [US1] Étendre `tests/unit/test_suggestion.py` : validation à la relecture — position absente acceptée (suggestion d'avant-feature, FR-005), position mal formée (types, bornes, clés manquantes) → `ErreurSuggestion`, code retour 2, message clair (D4)
-- [ ] T003 [P] [US2] Créer `tests/integration/test_extrait.py` : CLI — `--extrait 12` puis `--extrait 2` donnent des extraits d'exactement 12 et 2 lignes sur les motifs à intervalle suffisant (SC-002) ; `--extrait 1` et `--extrait 40` → code retour 3 avec message des bornes (FR-003) ; `--extrait 12` sans `--dry-run` → code retour 0, aucune suggestion générée (clarification du 2026-09-29, Option A)
+- [x] T001 [P] [US1] Étendre `tests/unit/test_suggestion.py` : enrichissement des motifs — extrait de N lignes exactes quand l'intervalle le permet (FR-001), intervalle plus court rendu tel quel sans complément (cas limite de la spec), vrais sauts de ligne, position `{"page": entier >= 1, "debut": entier >= 0, "fin": entier > debut, inclue}` ancrée sur la première occurrence (FR-002), extrait et position désignant le même endroit (D1, D3)
+- [x] T002 [US1] Étendre `tests/unit/test_suggestion.py` : validation à la relecture — position absente acceptée (suggestion d'avant-feature, FR-005), position mal formée (types, bornes, clés manquantes) → `ErreurSuggestion`, code retour 2, message clair (D4)
+- [x] T003 [P] [US2] Créer `tests/integration/test_extrait.py` : CLI — `--extrait 12` puis `--extrait 2` donnent des extraits d'exactement 12 et 2 lignes sur les motifs à intervalle suffisant (SC-002) ; `--extrait 1` et `--extrait 40` → code retour 3 avec message des bornes (FR-003) ; `--extrait 12` sans `--dry-run` → code retour 0, aucune suggestion générée (clarification du 2026-09-29, Option A)
 
 **Checkpoint**: les nouveaux tests échouent pour la bonne raison (extrait actuel : 3 lignes jointes par « ` / ` », pas de champ position, pas d'option)
 
@@ -44,9 +44,9 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Étendre `construire_suggestion` dans `md_cleaner/suggestion.py` : nouveaux paramètres `pages` et `extrait_n` (défaut 5) — pour chaque motif, recalculer l'extrait depuis les `emplacements` (N premières lignes du premier intervalle de la page de première occurrence, jointes par vrais sauts de ligne, jamais de complément) et ajouter le champ `position` `{"page": P, "debut": D, "fin": F}` avec `F` inclue (conversion depuis l'intervalle interne demi-ouvert : `F = fin_interne - 1`) ; ancrage identique pour l'extrait et la position (D1, D3) ; ne pas modifier `md_cleaner/detection.py`
-- [ ] T005 [US1] Câbler l'enrichissement dans `md_cleaner/cli.py` : passer `pages` et la valeur d'extrait à `construire_suggestion` dans tous les modes (l'effet n'est visible qu'en dry-run, seul mode écrivant la suggestion) (D2)
-- [ ] T006 [US1] Vérifier que T001/T002 passent et que la suite complète reste au vert sans relâchement (SC-006) : `pytest`
+- [x] T004 [US1] Étendre `construire_suggestion` dans `md_cleaner/suggestion.py` : nouveaux paramètres `pages` et `extrait_n` (défaut 5) — pour chaque motif, recalculer l'extrait depuis les `emplacements` (N premières lignes du premier intervalle de la page de première occurrence, jointes par vrais sauts de ligne, jamais de complément) et ajouter le champ `position` `{"page": P, "debut": D, "fin": F}` avec `F` inclue (conversion depuis l'intervalle interne demi-ouvert : `F = fin_interne - 1`) ; ancrage identique pour l'extrait et la position (D1, D3) ; ne pas modifier `md_cleaner/detection.py`
+- [x] T005 [US1] Câbler l'enrichissement dans `md_cleaner/cli.py` : passer `pages` et la valeur d'extrait à `construire_suggestion` dans tous les modes (l'effet n'est visible qu'en dry-run, seul mode écrivant la suggestion) (D2)
+- [x] T006 [US1] Vérifier que T001/T002 passent et que la suite complète reste au vert sans relâchement (SC-006) : `pytest`
 
 **Checkpoint**: User Story 1 fonctionnelle — extrait multi-lignes et position dans le JSON
 
@@ -60,8 +60,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Ajouter l'option `--extrait N` à `construire_analyseur()` dans `md_cleaner/cli.py` : validateur `_entier_bornes` existant, bornes 2 à 25, défaut 5 ; l'aide documente que l'effet est limité à la génération de `suggestion.json` et qu'il est sans effet observable hors `--dry-run` (FR-003, clarification du 2026-09-29, D2)
-- [ ] T008 [US2] Vérifier que T003 passe et que la suite complète reste au vert : `pytest`
+- [x] T007 [US2] Ajouter l'option `--extrait N` à `construire_analyseur()` dans `md_cleaner/cli.py` : validateur `_entier_bornes` existant, bornes 2 à 25, défaut 5 ; l'aide documente que l'effet est limité à la génération de `suggestion.json` et qu'il est sans effet observable hors `--dry-run` (FR-003, clarification du 2026-09-29, D2)
+- [x] T008 [US2] Vérifier que T003 passe et que la suite complète reste au vert : `pytest`
 
 **Checkpoint**: User Stories 1 et 2 fonctionnelles indépendamment
 
@@ -75,8 +75,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 3
 
-- [ ] T009 [US3] Neutraliser les sauts de ligne dans `generer_rapport()` (`md_cleaner/suggestion.py`) : remplacer `\n` par le séparateur historique « ` / ` » dans les cellules du tableau, après l'échappement des pipes et avant la troncature à 120 caractères ; structure en deux sections (feature 002) et troncature inchangées (FR-004, D5)
-- [ ] T010 [US3] Étendre `tests/unit/test_suggestion.py` (ou `tests/integration/test_extrait.py`) : le rapport d'un dry-run ne contient aucun saut de ligne dans ses cellules de tableau (SC-006) ; exécuter le Scénario 5 du quickstart — une suggestion sans champ position se consomme avec code 0 (FR-005)
+- [x] T009 [US3] Neutraliser les sauts de ligne dans `generer_rapport()` (`md_cleaner/suggestion.py`) : remplacer `\n` par le séparateur historique « ` / ` » dans les cellules du tableau, après l'échappement des pipes et avant la troncature à 120 caractères ; structure en deux sections (feature 002) et troncature inchangées (FR-004, D5)
+- [x] T010 [US3] Étendre `tests/unit/test_suggestion.py` (ou `tests/integration/test_extrait.py`) : le rapport d'un dry-run ne contient aucun saut de ligne dans ses cellules de tableau (SC-006) ; exécuter le Scénario 5 du quickstart — une suggestion sans champ position se consomme avec code 0 (FR-005)
 
 **Checkpoint**: les trois user stories sont fonctionnelles indépendamment
 
@@ -86,9 +86,9 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 **Purpose**: contrat, validation complète, conformité
 
-- [ ] T011 [P] Réviser `specs/001-nettoyage-md-repetitif/contracts/formats.md` : clause `motifs[].extrait` (« ≤ 3 lignes jointes par " / " ») remplacée par la définition de `specs/003-extrait-lisible/contracts/suggestion-extrait.md`, champ `position` ajouté au schéma (FR-007, D7)
-- [ ] T012 [P] Exécuter la validation complète de `specs/003-extrait-lisible/quickstart.md` (Scénarios 0 à 7) et consigner tout écart — en particulier le Scénario 6 (déterminisme et garde < 1 Mo à N = 25) et le Scénario 7 (invariance du nettoyage, FR-009)
-- [ ] T013 Revue de conformité : `ruff check` et `ruff format` sur les fichiers modifiés, `pre-commit run --all-files` complet — zéro modification de `detection.py` (D1), zéro nouvelle dépendance, garde < 1 Mo vérifiée sur le corpus
+- [x] T011 [P] Réviser `specs/001-nettoyage-md-repetitif/contracts/formats.md` : clause `motifs[].extrait` (« ≤ 3 lignes jointes par " / " ») remplacée par la définition de `specs/003-extrait-lisible/contracts/suggestion-extrait.md`, champ `position` ajouté au schéma (FR-007, D7)
+- [x] T012 [P] Exécuter la validation complète de `specs/003-extrait-lisible/quickstart.md` (Scénarios 0 à 7) et consigner tout écart — en particulier le Scénario 6 (déterminisme et garde < 1 Mo à N = 25) et le Scénario 7 (invariance du nettoyage, FR-009)
+- [x] T013 Revue de conformité : `ruff check` et `ruff format` sur les fichiers modifiés, `pre-commit run --all-files` complet — zéro modification de `detection.py` (D1), zéro nouvelle dépendance, garde < 1 Mo vérifiée sur le corpus
 
 ---
 

@@ -62,7 +62,7 @@ def test_bascule_action_appliquee(tmp_path) -> None:
     defaut = (tmp_path / "defaut" / "001" / "nettoye.md").read_text(encoding="utf-8")
     edite = (tmp_path / "edite" / "001" / "nettoye.md").read_text(encoding="utf-8")
     premiere_ligne = next(
-        morceau.strip() for morceau in motif["extrait"].split(" / ") if morceau.strip()
+        morceau.strip() for morceau in motif["extrait"].split("\n") if morceau.strip()
     )
     assert premiere_ligne not in defaut
     assert premiere_ligne in edite

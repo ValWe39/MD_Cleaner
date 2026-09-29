@@ -93,6 +93,15 @@ def construire_analyseur() -> _Analyseur:
         help="nombre de premières pages pour l'auto-calibrage (défaut : 5)",
     )
     analyseur.add_argument(
+        "--extrait",
+        type=int,
+        default=5,
+        help=(
+            "nombre de lignes d'extrait dans suggestion.json (2-25, défaut 5) ; "
+            "effet limité au dry-run, sans effet observable sinon"
+        ),
+    )
+    analyseur.add_argument(
         "--sortie",
         type=Path,
         default=Path("output"),
@@ -116,6 +125,10 @@ def _titre_du_document(lignes: list[str], defaut: str) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     args = construire_analyseur().parse_args(argv)
+
+    if not 2 <= args.extrait <= 25:
+        print("erreur : --extrait doit être entre 2 et 25", file=sys.stderr)
+        return CODE_USAGE
 
     if args.dry_run and args.suggestion:
         print("erreur : --dry-run et --suggestion sont incompatibles", file=sys.stderr)
@@ -167,7 +180,13 @@ def main(argv: list[str] | None = None) -> int:
             return CODE_ARTEFACT
     else:
         suggestion = construire_suggestion(
-            fichier.name, args.seuil, mode, len(pages), motifs
+            fichier.name,
+            args.seuil,
+            mode,
+            len(pages),
+            motifs,
+            pages=pages,
+            extrait_n=args.extrait,
         )
 
     dossier = creer_dossier_run(args.sortie, titre, args.nom_titre)

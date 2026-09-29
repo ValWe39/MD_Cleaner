@@ -16,27 +16,60 @@ class ErreurSuggestion(Exception):
 
 
 def construire_suggestion(
-    source: str, seuil: int, mode_segmentation: str, nb_pages: int, motifs: list[Motif]
+    source: str,
+    seuil: int,
+    mode_segmentation: str,
+    nb_pages: int,
+    motifs: list[Motif],
+    pages: list | None = None,
+    extrait_n: int = 5,
 ) -> dict:
-    """Suggestion par défaut consommable et éditable (D5)."""
+    """Suggestion par défaut consommable et éditable (D5 feature 001).
+
+    Feature 003 : avec `pages`, chaque motif est enrichi — l'extrait
+    devient les `extrait_n` premières lignes du premier intervalle de
+    sa page de première occurrence, rendues en vrais sauts de ligne,
+    et un champ position (fin inclue, même ancrage) est ajouté
+    (FR-001, FR-002, D1/D3)."""
+    motifs_json = []
+    for m in motifs:
+        entree: dict = {
+            "id": m.id,
+            "action": m.action,
+            "nb_lignes": m.nb_lignes,
+            "frequence": m.frequence,
+            "pages": list(m.pages),
+            "extrait": m.extrait,
+        }
+        if pages is not None:
+            extrait, position = _enrichir_motif(pages, m, extrait_n)
+            entree["extrait"] = extrait
+            entree["position"] = position
+        motifs_json.append(entree)
     return {
         "version": 1,
         "source": source,
         "seuil": seuil,
         "mode_segmentation": mode_segmentation,
         "nb_pages": nb_pages,
-        "motifs": [
-            {
-                "id": m.id,
-                "action": m.action,
-                "nb_lignes": m.nb_lignes,
-                "frequence": m.frequence,
-                "pages": list(m.pages),
-                "extrait": m.extrait,
-            }
-            for m in motifs
-        ],
+        "motifs": motifs_json,
     }
+
+
+def _enrichir_motif(pages: list, motif: Motif, extrait_n: int) -> tuple:
+    """Extrait multi-lignes et position du motif, ancrés sur sa
+    première occurrence (page la plus ancienne, premier intervalle).
+
+    `fin` de la position est incluse : conversion depuis l'intervalle
+    interne demi-ouvert (D3)."""
+    position = {p.numero: i for i, p in enumerate(pages)}
+    num0 = min(
+        motif.emplacements, key=lambda n: (position[n], motif.emplacements[n][0][0])
+    )
+    debut, fin = motif.emplacements[num0][0]
+    lignes = pages[position[num0]].lignes[debut : min(debut + extrait_n, fin)]
+    extrait = "\n".join(lignes)
+    return extrait, {"page": num0, "debut": debut, "fin": fin - 1}
 
 
 def ecrire_suggestion(chemin: Path, suggestion: dict) -> None:
@@ -107,7 +140,33 @@ def lire_suggestion(chemin: Path, source: str) -> dict:
             )
         if not isinstance(motif.get("extrait"), str):
             raise ErreurSuggestion(f"suggestion invalide : extrait pour {identifiant}")
+        if "position" in motif and not _position_valide(motif["position"]):
+            raise ErreurSuggestion(
+                f"suggestion invalide : position pour {identifiant} "
+                "(objet {page, debut, fin} avec page >= 1, debut >= 0, fin > debut attendu)"
+            )
     return donnees
+
+
+def _position_valide(position: object) -> bool:
+    """FR-005 : position optionnelle mais, si présente, bien formée."""
+    if not isinstance(position, dict):
+        return False
+    cles = ("page", "debut", "fin")
+    if any(cle not in position for cle in cles):
+        return False
+
+    def entier(valeur: object) -> bool:
+        return isinstance(valeur, int) and not isinstance(valeur, bool)
+
+    return (
+        entier(position["page"])
+        and position["page"] >= 1
+        and entier(position["debut"])
+        and position["debut"] >= 0
+        and entier(position["fin"])
+        and position["fin"] > position["debut"]
+    )
 
 
 def appliquer_actions(motifs: list[Motif], suggestion: dict) -> None:
@@ -143,7 +202,10 @@ def generer_rapport(chemin: Path, suggestion: dict, avertissements: list[str]) -
     supprimer = [m for m in suggestion["motifs"] if m["action"] == "supprimer"]
     conserver = [m for m in suggestion["motifs"] if m["action"] == "conserver"]
     for motif in supprimer:
-        extrait = motif["extrait"].replace("|", "\\|")[:120]
+        # FR-004 : les sauts de ligne sont neutralisés dans les cellules
+        # du tableau (un \n y terminerait la rangée markdown) ;
+        # troncature à 120 caractères inchangée.
+        extrait = motif["extrait"].replace("|", "\\|").replace("\n", " / ")[:120]
         lignes.append(
             f"| {motif['id']} | {motif['action']} | {motif['frequence']} "
             f"| {len(motif['pages'])} pages | {extrait} |"
