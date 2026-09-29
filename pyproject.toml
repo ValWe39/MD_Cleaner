@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "md-cleaner"
+version = "0.1.0"
+description = "Nettoyage deterministe de fichiers Markdown multi-pages : suppression des motifs repetitifs et pagination pour RAG"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "MD_Cleaner" }]
+
+[project.scripts]
+md-cleaner = "md_cleaner.cli:main"
+
+[tool.setuptools]
+packages = ["md_cleaner"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
