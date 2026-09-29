@@ -101,6 +101,7 @@ jobs:
       - name: Lint Markdown (exclusions input output Prompts .vibe .github/workflows Licence)
         run: |
           markdownlint-cli2 '**/*.md' \
+            '!.venv/**' \
             '!input/**' \
             '!output/**' \
             '!Prompts/**' \
