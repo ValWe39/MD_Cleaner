@@ -28,11 +28,11 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 **Purpose**: Tests écrits d'abord (TDD) — ils DOIVENT échouer avant implémentation. La feature modifie un outil existant ; aucun setup de projet.
 
-- [ ] T001 [P] [US1] Étendre `tests/unit/test_detection.py` : frontière majoritaire stricte — une candidate chevauchant un bloc sur exactement la moitié de ses pages ne fusionne PAS (deux blocs distincts), sur strictement plus de la moitié elle fusionne (FR-001, clarification du 2026-09-29, D1)
-- [ ] T002 [P] [US1] Créer `tests/integration/test_decidabilite.py` : sur `Examples/Exemple_2/2.Input/consolidated.md` — zone filtres et métadonnées de publications dans des motifs distincts (SC-001) ; nombre de motifs `supprimer` ≤ 5 (SC-003) ; bascule ciblée (filtres `supprimer`, métadonnées `conserver`) produit un `nettoye.md` sans filtres mais avec les métadonnées (US1, scénario 2)
-- [ ] T003 [US1] Étendre `tests/integration/test_decidabilite.py` : non-régression `Examples/Exemple_1/2.Input/consolidated.md` — 4 motifs, zones couvertes et actions identiques à la version précédente (SC-002, FR-003) ; déterminisme octet par octet sur double exécution (SC-005)
-- [ ] T004 [P] [US2] Étendre `tests/unit/test_suggestion.py` : `generer_rapport()` sépare les motifs `supprimer` (tableau « Décisions requises ») de tous les motifs `conserver` (section secondaire, aucune action requise) ; sections vides affichées « aucun » (FR-004, D3, contracts/rapport-dry-run.md)
-- [ ] T005 [P] [US2] Étendre `tests/integration/test_dry_run.py` : sur Exemple_1, pas de section secondaire superflue (US2, scénario 3) ; sur Exemple_2, le tableau des décisions requises énumère ≤ 5 lignes (SC-003)
+- [x] T001 [P] [US1] Étendre `tests/unit/test_detection.py` : frontière majoritaire stricte — une candidate chevauchant un bloc sur exactement la moitié de ses pages ne fusionne PAS (deux blocs distincts), sur strictement plus de la moitié elle fusionne (FR-001, clarification du 2026-09-29, D1)
+- [x] T002 [P] [US1] Créer `tests/integration/test_decidabilite.py` : sur `Examples/Exemple_2/2.Input/consolidated.md` — zone filtres et métadonnées de publications dans des motifs distincts (SC-001) ; nombre de motifs `supprimer` ≤ 5 (SC-003) ; bascule ciblée (filtres `supprimer`, métadonnées `conserver`) produit un `nettoye.md` sans filtres mais avec les métadonnées (US1, scénario 2)
+- [x] T003 [US1] Étendre `tests/integration/test_decidabilite.py` : non-régression `Examples/Exemple_1/2.Input/consolidated.md` — 4 motifs, zones couvertes et actions identiques à la version précédente (SC-002, FR-003) ; déterminisme octet par octet sur double exécution (SC-005)
+- [x] T004 [P] [US2] Étendre `tests/unit/test_suggestion.py` : `generer_rapport()` sépare les motifs `supprimer` (tableau « Décisions requises ») de tous les motifs `conserver` (section secondaire, aucune action requise) ; sections vides affichées « aucun » (FR-004, D3, contracts/rapport-dry-run.md)
+- [x] T005 [P] [US2] Étendre `tests/integration/test_dry_run.py` : sur Exemple_1, pas de section secondaire superflue (US2, scénario 3) ; sur Exemple_2, le tableau des décisions requises énumère ≤ 5 lignes (SC-003)
 
 **Checkpoint**: tous les nouveaux tests échouent pour la bonne raison (fusion actuelle soude tout ; rapport actuel à une seule table)
 
@@ -46,8 +46,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Modifier le filtre d'admission de fusion dans `md_cleaner/detection.py` (boucle `touches`) : pour chaque bloc existant, compter les pages de la candidate où le chevauchement se produit ; fusionner la candidate avec les blocs où `2 * pages_chevauchantes > len(pages_cles)` (strictement plus de la moitié, comparaison entière — D1, D6) ; à la moitié exacte ou moins, la candidate crée son propre bloc ; multi-blocs admissibles fusionnent tous dans le premier (D2) ; commentaire renvoyant à FR-001 et à la clarification du 2026-09-29 ; ne rien changer d'autre dans `detecter()` (tri, ids, emplacements)
-- [ ] T007 [US1] Vérifier que les tests T001-T003 passent et que la suite existante reste au vert sans relâchement de seuil (SC-004) : `pytest`
+- [x] T006 [US1] Modifier le filtre d'admission de fusion dans `md_cleaner/detection.py` (boucle `touches`) : pour chaque bloc existant, compter les pages de la candidate où le chevauchement se produit ; fusionner la candidate avec les blocs où `2 * pages_chevauchantes > len(pages_cles)` (strictement plus de la moitié, comparaison entière — D1, D6) ; à la moitié exacte ou moins, la candidate crée son propre bloc ; multi-blocs admissibles fusionnent tous dans le premier (D2) ; commentaire renvoyant à FR-001 et à la clarification du 2026-09-29 ; ne rien changer d'autre dans `detecter()` (tri, ids, emplacements)
+- [x] T007 [US1] Vérifier que les tests T001-T003 passent et que la suite existante reste au vert sans relâchement de seuil (SC-004) : `pytest`
 
 **Checkpoint**: User Story 1 fonctionnelle — la séparation filtres/métadonnées est effective, Exemple_1 inchangé
 
@@ -61,8 +61,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Modifier `generer_rapport()` dans `md_cleaner/suggestion.py` : deux sections conformes à `specs/002-fusion-majoritaire/contracts/rapport-dry-run.md` — tableau « Décisions requises » (motifs `action = supprimer` uniquement), section « Motifs conservés par défaut — aucune action requise » (tous les motifs `conserver`, sous le seuil ou non) remplaçant l'actuelle section « sous le seuil » ; « aucun » affiché pour une section vide ; sections « Cas limites » et « Appliquer la suggestion » inchangées (D3) ; `suggestion.json` inchangé (tous les motifs, chacun actionnable)
-- [ ] T009 [US2] Vérifier que les tests T004-T005 passent et que le rapport d'un document riche reste parcourable en moins de 5 minutes (SC-006, validation manuelle du quickstart Scénario 2)
+- [x] T008 [US2] Modifier `generer_rapport()` dans `md_cleaner/suggestion.py` : deux sections conformes à `specs/002-fusion-majoritaire/contracts/rapport-dry-run.md` — tableau « Décisions requises » (motifs `action = supprimer` uniquement), section « Motifs conservés par défaut — aucune action requise » (tous les motifs `conserver`, sous le seuil ou non) remplaçant l'actuelle section « sous le seuil » ; « aucun » affiché pour une section vide ; sections « Cas limites » et « Appliquer la suggestion » inchangées (D3) ; `suggestion.json` inchangé (tous les motifs, chacun actionnable)
+- [x] T009 [US2] Vérifier que les tests T004-T005 passent et que le rapport d'un document riche reste parcourable en moins de 5 minutes (SC-006, validation manuelle du quickstart Scénario 2)
 
 **Checkpoint**: User Stories 1 et 2 fonctionnelles indépendamment
 
@@ -76,8 +76,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 3
 
-- [ ] T010 [US3] Modifier `README.md` : ajouter une note « les ids de motifs ne sont pas stables entre versions de l'outil ; après une mise à jour, régénérez la suggestion par dry-run ; une suggestion d'une version antérieure échoue proprement (id inconnu, code 2) » (FR-007, D4) — aucune modification de code, le comportement d'échec étant déjà couvert par le test existant (FR-008)
-- [ ] T011 [US3] Exécuter le Scénario 4 du quickstart (`quickstart.md`) avec une suggestion générée avant la feature : échec rapide, code 2, message ids inconnus — consigner le résultat
+- [x] T010 [US3] Modifier `README.md` : ajouter une note « les ids de motifs ne sont pas stables entre versions de l'outil ; après une mise à jour, régénérez la suggestion par dry-run ; une suggestion d'une version antérieure échoue proprement (id inconnu, code 2) » (FR-007, D4) — aucune modification de code, le comportement d'échec étant déjà couvert par le test existant (FR-008)
+- [x] T011 [US3] Exécuter le Scénario 4 du quickstart (`quickstart.md`) avec une suggestion générée avant la feature : échec rapide, code 2, message ids inconnus — consigner le résultat
 
 **Checkpoint**: les trois user stories sont fonctionnelles indépendamment
 
@@ -87,8 +87,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 **Purpose**: validation transversale des trois stories
 
-- [ ] T012 [P] Exécuter la validation complète de `specs/002-fusion-majoritaire/quickstart.md` (Scénarios 0 à 5) et consigner tout écart
-- [ ] T013 Revue de conformité : `ruff check` et `ruff format` sur les fichiers modifiés (`md_cleaner/detection.py`, `md_cleaner/suggestion.py`, tests, README), puis `pre-commit run --all-files` complet — zéro nouvelle dépendance, zéro option CLI ajoutée (FR-010), déterminisme re-vérifié (SC-005)
+- [x] T012 [P] Exécuter la validation complète de `specs/002-fusion-majoritaire/quickstart.md` (Scénarios 0 à 5) et consigner tout écart
+- [x] T013 Revue de conformité : `ruff check` et `ruff format` sur les fichiers modifiés (`md_cleaner/detection.py`, `md_cleaner/suggestion.py`, tests, README), puis `pre-commit run --all-files` complet — zéro nouvelle dépendance, zéro option CLI ajoutée (FR-010), déterminisme re-vérifié (SC-005)
 
 ---
 

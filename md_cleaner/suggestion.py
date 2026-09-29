@@ -125,32 +125,36 @@ def appliquer_actions(motifs: list[Motif], suggestion: dict) -> None:
 
 
 def generer_rapport(chemin: Path, suggestion: dict, avertissements: list[str]) -> None:
-    """Rapport dry-run lisible : motifs, motifs sous le seuil, cas limites."""
-    seuil = suggestion["seuil"]
+    """Rapport dry-run en deux sections (FR-004, contracts/rapport-dry-run.md) :
+    décisions requises (motifs supprimer) et motifs conservés par défaut
+    (aucune action requise)."""
     lignes = [
         "# Rapport dry-run",
         "",
         f"Source : {suggestion['source']}",
-        f"Seuil : {seuil} % des {suggestion['nb_pages']} pages",
+        f"Seuil : {suggestion['seuil']} % des {suggestion['nb_pages']} pages",
         f"Mode de segmentation : {suggestion['mode_segmentation']}",
         "",
-        "## Motifs détectés",
+        "## Décisions requises",
         "",
         "| Id | Action suggérée | Fréquence | Pages | Extrait |",
         "| -- | --------------- | --------- | ----- | ------- |",
     ]
-    for motif in suggestion["motifs"]:
+    supprimer = [m for m in suggestion["motifs"] if m["action"] == "supprimer"]
+    conserver = [m for m in suggestion["motifs"] if m["action"] == "conserver"]
+    for motif in supprimer:
         extrait = motif["extrait"].replace("|", "\\|")[:120]
         lignes.append(
             f"| {motif['id']} | {motif['action']} | {motif['frequence']} "
             f"| {len(motif['pages'])} pages | {extrait} |"
         )
-    sous_seuil = [m for m in suggestion["motifs"] if m["frequence"] < seuil / 100]
+    if not supprimer:
+        lignes.append("aucun")
     lignes.append("")
-    lignes.append("## Motifs sous le seuil (conservés par défaut)")
-    for motif in sous_seuil:
+    lignes.append("## Motifs conservés par défaut — aucune action requise")
+    for motif in conserver:
         lignes.append(f"- {motif['id']} ({motif['frequence']}) : {motif['extrait']}")
-    if not sous_seuil:
+    if not conserver:
         lignes.append("- aucun")
     lignes.append("")
     lignes.append("## Cas limites")

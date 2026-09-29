@@ -10,6 +10,7 @@ from md_cleaner.suggestion import (
     appliquer_actions,
     construire_suggestion,
     ecrire_suggestion,
+    generer_rapport,
     lire_suggestion,
 )
 
@@ -139,3 +140,54 @@ def test_appliquer_actions_id_inconnu() -> None:
     suggestion = {"motifs": [{"id": "M99", "action": "supprimer"}]}
     with pytest.raises(ErreurSuggestion, match="M99"):
         appliquer_actions(motifs, suggestion)
+
+
+# --- Feature 002 : rapport en deux sections (FR-004, T004) ---
+
+
+def _rapport(tmp_path, motifs: list) -> str:
+    suggestion = {
+        "version": 1,
+        "source": "doc.md",
+        "seuil": 80,
+        "mode_segmentation": "explicite",
+        "nb_pages": 4,
+        "motifs": motifs,
+    }
+    generer_rapport(tmp_path / "rapport.md", suggestion, [])
+    return (tmp_path / "rapport.md").read_text(encoding="utf-8")
+
+
+def _motif_json(id: str, action: str) -> dict:
+    return {
+        "id": id,
+        "action": action,
+        "nb_lignes": 2,
+        "frequence": 0.5,
+        "pages": [1, 2],
+        "extrait": "ligne extra",
+    }
+
+
+def test_rapport_deux_sections(tmp_path) -> None:
+    """FR-004 : décisions requises (supprimer) séparées des motifs
+    conservés par défaut, sans action requise."""
+    texte = _rapport(
+        tmp_path,
+        [_motif_json("M01", "supprimer"), _motif_json("M02", "conserver")],
+    )
+    assert "## Décisions requises" in texte
+    assert "| M01 | supprimer" in texte
+    assert "## Motifs conservés par défaut — aucune action requise" in texte
+    assert "- M02 (0.5) : ligne extra" in texte
+    # Le motif conservé ne doit pas figurer dans le tableau des décisions
+    tableau = texte.split("## Motifs conservés par défaut")[0]
+    assert "M02 |" not in tableau
+
+
+def test_rapport_sections_vides(tmp_path) -> None:
+    """Contrat rapport : une section vide affiche « aucun »."""
+    texte = _rapport(tmp_path, [])
+    assert "## Décisions requises" in texte
+    assert "## Motifs conservés par défaut — aucune action requise" in texte
+    assert texte.count("aucun") >= 2

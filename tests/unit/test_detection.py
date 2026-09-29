@@ -104,3 +104,59 @@ def test_seuil_reglable() -> None:
     pages = _pages(contenus)
     assert detecter(pages, seuil=80)[0].action == "supprimer"
     assert detecter(pages, seuil=95)[0].action == "conserver"
+
+
+# --- Feature 002 : frontière majoritaire stricte (FR-001, T001) ---
+
+NAV = ["NAV_A", "NAV_B"]
+MID = ["MID_1", "MID_2"]
+
+
+def _pages_frontiere(placement_adjacent: list[int]) -> list:
+    """4 pages : NAV et MID récurrents sur toutes les pages.
+
+    Sur les pages listées dans placement_adjacent, MID colle à NAV
+    (intervalles touchants = chevauchement) ; sur les autres, MID est
+    séparé de NAV par du contenu unique (aucun chevauchement)."""
+    pages: list[list[str]] = []
+    noms = ["alpha", "bravo", "charlie", "delta", "echo", "fox-trot"]
+    for numero in range(1, 5):
+        if numero in placement_adjacent:
+            pages.append(NAV + MID + [f"contenu propre {noms[numero]}"])
+        else:
+            pages.append(
+                MID
+                + [f"texte seul {noms[numero]}"]
+                + NAV
+                + [f"suite {noms[numero + 1]}"]
+            )
+    return _pages(pages)
+
+
+def _norm(lignes: list[str]) -> list[str]:
+    return [normaliser_ligne(ligne) for ligne in lignes]
+
+
+def test_frontiere_moitie_exacte_pas_de_fusion() -> None:
+    """FR-001 : chevauchement sur exactement la moitié des pages de la
+    candidate → refus de fusion : deux motifs distincts là où l'ancienne
+    règle (≥ 1 page) n'en produisait qu'un seul."""
+    motifs = detecter(_pages_frontiere([1, 2]))
+    assert len(motifs) == 2, (
+        "à la moitié exacte des pages chevauchantes, la candidate MID doit "
+        "former son propre bloc (2 motifs), pas fusionner avec NAV"
+    )
+    pages_motifs = {tuple(m.pages) for m in motifs}
+    assert pages_motifs == {(1, 2, 3, 4)}
+
+
+def test_plus_de_la_moitie_fusion() -> None:
+    """FR-001 : chevauchement sur strictement plus de la moitié → fusion."""
+    motifs = detecter(_pages_frontiere([1, 2, 3]))
+    touches = [
+        m for m in motifs if m.lignes_norm and m.lignes_norm[0] in _norm(NAV + MID)
+    ]
+    assert len(touches) == 1, (
+        "à 3 pages chevauchantes sur 4, NAV et MID fusionnent en un seul motif"
+    )
+    assert touches[0].pages == [1, 2, 3, 4]

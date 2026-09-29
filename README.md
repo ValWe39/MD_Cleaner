@@ -91,6 +91,14 @@ md-cleaner $fichier --echantillon .\Examples\Exemple_2\1.Sample
 
 Contrat CLI complet : `specs/001-nettoyage-md-repetitif/contracts/cli.md`.
 
+## Notes de version
+
+Les ids de motifs (M01, M02, ...) ne sont pas stables entre versions de
+l'outil : après une mise à jour, régénérez la suggestion par un
+`--dry-run`. Une suggestion issue d'une version antérieure échoue
+proprement (id inconnu, code retour 2) ou, si les ids coïncident,
+s'applique à des motifs différents — dans tous les cas, régénérez.
+
 ## Développement
 
 ```powershell

@@ -94,3 +94,30 @@ def test_dry_run_avec_suggestion_refuse(tmp_path) -> None:
 
     code = main([str(ENTREE), "--dry-run", "--suggestion", "x.json"])
     assert code == CODE_USAGE
+
+
+# --- Feature 002 : lisibilité du rapport (FR-004, SC-003, T005) ---
+
+
+def test_rapport_exemple_1_sans_section_secondaire_superflue(tmp_path) -> None:
+    """US2 scénario 3 : Exemple_1 (tous motifs supprimer) — la section
+    secondaire affiche « aucun », pas de bruit."""
+    main([str(ENTREE), "--dry-run", "--sortie", str(tmp_path)])
+    rapport = (tmp_path / "001" / "rapport-dry-run.md").read_text(encoding="utf-8")
+    assert "## Décisions requises" in rapport
+    lignes_conservees = rapport.split("## Motifs conservés par défaut")[1]
+    assert "aucun" in lignes_conservees.split("##")[0]
+
+
+def test_rapport_exemple_2_decisions_bornees(tmp_path) -> None:
+    """SC-003 : le tableau des décisions requises énumère au plus 5 motifs
+    sur un document riche ; les conservés sont en section secondaire."""
+    entree = RACINE / "Examples" / "Exemple_2" / "2.Input" / "consolidated.md"
+    main([str(entree), "--dry-run", "--sortie", str(tmp_path)])
+    rapport = (tmp_path / "001" / "rapport-dry-run.md").read_text(encoding="utf-8")
+    tableau = rapport.split("## Motifs conservés par défaut")[0]
+    lignes_decision = [
+        ligne for ligne in tableau.splitlines() if ligne.startswith("| M")
+    ]
+    assert 1 <= len(lignes_decision) <= 5
+    assert "## Motifs conservés par défaut" in rapport

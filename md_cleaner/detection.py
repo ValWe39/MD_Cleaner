@@ -115,18 +115,24 @@ def detecter(
             spans = {
                 num: [(pages_cles[num], pages_cles[num] + w)] for num in pages_cles
             }
-            touches = [
-                bloc
-                for bloc in blocs
-                if any(
-                    num in bloc["emplacements"]
+            touches = []
+            for bloc in blocs:
+                chevauchantes = sum(
+                    1
+                    for num in pages_cles
+                    if num in bloc["emplacements"]
                     and any(
                         _chevauche(interval, spans[num][0])
                         for interval in bloc["emplacements"][num]
                     )
-                    for num in pages_cles
                 )
-            ]
+                # FR-001 : la fusion n'est admise que si le chevauchement
+                # se vérifie sur strictement plus de la moitié des pages
+                # de la candidate (clarification du 2026-09-29, D1/D6 de
+                # la feature 002) ; à la moitié exacte ou moins, la
+                # candidate crée son propre bloc.
+                if 2 * chevauchantes > len(pages_cles):
+                    touches.append(bloc)
             if touches:
                 cible = touches[0]
                 for autre in touches[1:]:
