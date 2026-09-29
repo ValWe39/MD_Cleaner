@@ -106,6 +106,7 @@ jobs:
             '!Prompts/**' \
             '!.vibe/**' \
             '!.github/workflows/**' \
+            '!Examples/**' \
             '!Licence'
 
   # --- Job 4 : Audit de sécurité des workflows ---

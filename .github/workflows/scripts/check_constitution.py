@@ -38,6 +38,17 @@ EXCLUDED_FILES = {
     Path(".github/workflows/scripts/check_action_pinning.py"),
 }
 
+# Dossiers de contenu de référence exclus des vérifications
+# (ex: Examples/ contient des captures de pages avec "stripe", "analytics")
+EXCLUDED_DIRS = {"Examples"}
+
+
+def is_excluded(file_path: Path) -> bool:
+    """Vrai si le fichier est listé dans EXCLUDED_FILES ou sous EXCLUDED_DIRS."""
+    top_dir = file_path.parts[0] if file_path.parts else ""
+    return file_path in EXCLUDED_FILES or top_dir in EXCLUDED_DIRS
+
+
 CLOUD_SERVICES = {
     "aws",
     "amazon",
@@ -88,7 +99,7 @@ def check_no_hardcoded_secrets(files: set[Path] | None = None) -> list[str]:
     files_to_check = files if files else set(Path(".").rglob("*"))
     for pattern in patterns:
         for file_path in files_to_check:
-            if not file_path.is_file() or file_path in EXCLUDED_FILES:
+            if not file_path.is_file() or is_excluded(file_path):
                 continue
             try:
                 content = file_path.read_text(encoding="utf-8", errors="ignore")
@@ -108,7 +119,7 @@ def check_no_cloud_services(files: set[Path] | None = None) -> list[str]:
     cloud_pattern = re.compile(r"(?i)(" + "|".join(CLOUD_SERVICES) + r")")
     files_to_check = files if files else set(Path(".").rglob("*.py"))
     for file_path in files_to_check:
-        if not file_path.is_file() or file_path in EXCLUDED_FILES:
+        if not file_path.is_file() or is_excluded(file_path):
             continue
         try:
             content = file_path.read_text(encoding="utf-8", errors="ignore")
@@ -132,7 +143,7 @@ def check_no_trackers(files: set[Path] | None = None) -> list[str]:
     ]
     files_to_check = files if files else set(Path(".").rglob("*.py"))
     for file_path in files_to_check:
-        if not file_path.is_file() or file_path in EXCLUDED_FILES:
+        if not file_path.is_file() or is_excluded(file_path):
             continue
         try:
             content = file_path.read_text(encoding="utf-8", errors="ignore")
@@ -154,7 +165,7 @@ def check_no_hardcoded_paths(files: set[Path] | None = None) -> list[str]:
     files_to_check = files if files else set(Path(".").rglob("*.py"))
     for pattern in path_patterns:
         for file_path in files_to_check:
-            if not file_path.is_file() or file_path in EXCLUDED_FILES:
+            if not file_path.is_file() or is_excluded(file_path):
                 continue
             try:
                 content = file_path.read_text(encoding="utf-8", errors="ignore")
