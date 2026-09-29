@@ -39,6 +39,7 @@ repos:
           '!**/.github/workflows/**',
           '!**/.specify/**',
           '**/.specify/memory/**',
+          '!**/.venv/**',
           '!**/input/**',
           '!**/output/**',
           '!**/Prompts/**',

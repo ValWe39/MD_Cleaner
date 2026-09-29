@@ -22,7 +22,10 @@ Produit par `--dry-run`, éditable par l'humain, consommé par `--suggestion` (F
       "nb_lignes": 27,
       "frequence": 1.0,
       "pages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-      "extrait": "Aller au contenu principal / [CORSEN AI](</fr/>) / ..."
+      "extrait": "Aller au contenu principal
+[CORSEN AI](</fr/>)
+..." ,
+      "position": {"page": 1, "debut": 1, "fin": 27}
     },
     {
       "id": "M04",
@@ -30,7 +33,8 @@ Produit par `--dry-run`, éditable par l'humain, consommé par `--suggestion` (F
       "nb_lignes": 1,
       "frequence": 0.57,
       "pages": [1, 2, 3, 4, 5, 6, 7, 8],
-      "extrait": "Lecon suivante ..."
+      "extrait": "Lecon suivante ...",
+      "position": {"page": 1, "debut": 40, "fin": 40}
     }
   ]
 }
@@ -47,7 +51,10 @@ Produit par `--dry-run`, éditable par l'humain, consommé par `--suggestion` (F
 | `motifs[].action` | `supprimer` \| `conserver` | Seul champ destiné à l'édition humaine |
 | `motifs[].frequence` | décimal [0, 1] | Arrondi à 2 décimales |
 | `motifs[].pages` | liste d'entiers | Triée croissante |
-| `motifs[].extrait` | texte | ≤ 3 lignes jointes par ` / ` |
+| `motifs[].extrait` | texte | Révisé par la feature 003 : N premières lignes du premier intervalle de la page de première occurrence (N défaut 5, option `--extrait` 2–25), rendues en vrais sauts de ligne ; intervalle plus court → tout ce qui existe |
+| `motifs[].position` | objet `{page, debut, fin}` | Feature 003 : première occurrence, `fin` inclue ; absent des suggestions d'avant-feature (accepté à la relecture), mal formé → code 2 |
+
+Révision de contrat (feature 003, FR-007) : la clause « extrait ≤ 3 lignes jointes par ` / ` » de la feature 001 est remplacée par la définition ci-dessus ; détail complet dans `specs/003-extrait-lisible/contracts/suggestion-extrait.md`.
 
 Validation au chargement (`--suggestion`) : échec rapide (code 2) si JSON invalide, `version` incorrecte, `source` ne correspondant pas à l'entrée, id dupliqué ou `action` invalide. Le run de nettoyage apparie chaque motif au document par `id` + lignes normalisées recalculées ; un id sans correspondance est une erreur bloquante, signalée avec son libellé.
 

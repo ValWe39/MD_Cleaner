@@ -14,3 +14,12 @@ Prompts/
 .specify/*
 !.specify/memory/
 .specify/memory/.*
+
+# Python (artefacts locaux)
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+dist/
+*.egg-info/

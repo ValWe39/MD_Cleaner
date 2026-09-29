@@ -54,7 +54,9 @@ CLOUD_SERVICES = {
     "amazon",
     r"(?<![A-Za-z])s3",  # évite le faux positif « US3 »
     "ec2",
-    "lambda",
+    # évite le faux positif du mot-clé Python « lambda » :
+    # seuls les usages AWS Lambda réels sont détectés
+    r"aws\s*lambda|lambda\s+(function|runtime|layer)",
     "firebas",
     "google.*cloud",
     "gcp",
