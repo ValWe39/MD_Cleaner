@@ -62,6 +62,10 @@ notepad .\output\002\rapport-dry-run.md
 notepad .\output\002\suggestion.json
 ```
 
+Chaque motif y présente un extrait multi-lignes (5 lignes par défaut)
+et sa position (`page`, `debut`, `fin`) dans le document d'origine —
+de quoi juger sans ouvrir le document source.
+
 Dans `suggestion.json`, remplacez une action `"supprimer"` par
 `"conserver"` (ou l'inverse) pour garder ou retirer un motif, sauvegardez,
 puis relancez le nettoyage avec votre version :
@@ -75,6 +79,7 @@ Les autres paramètres, combinables librement :
 ```powershell
 md-cleaner $fichier --pagine
 md-cleaner $fichier --seuil 95
+md-cleaner $fichier --dry-run --extrait 12
 md-cleaner $fichier --nom-titre 30
 md-cleaner $fichier --sortie .\mes-sorties
 md-cleaner $fichier --echantillon .\Examples\Exemple_2\1.Sample
@@ -86,6 +91,7 @@ md-cleaner $fichier --echantillon .\Examples\Exemple_2\1.Sample
 --nom-titre X   : nomme le run d'après les X premiers caractères du titre
 --sortie D      : dossier racine des sorties (défaut .\output)
 --echantillon D : calibrage sur un échantillon (5 fichiers .md max)
+--extrait N    : lignes d'extrait dans suggestion.json (2-25, défaut 5)
 --calibrage N   : pages d'auto-calibrage (défaut 5)
 ```
 
