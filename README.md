@@ -105,6 +105,27 @@ l'outil : après une mise à jour, régénérez la suggestion par un
 proprement (id inconnu, code retour 2) ou, si les ids coïncident,
 s'applique à des motifs différents — dans tous les cas, régénérez.
 
+## Sources des fichiers d'exemple
+
+Les fichiers du dossier `Examples/` sont des extraits bruts de pages
+publiques, utilisés uniquement comme données de test d'une fonction
+de nettoyage de Markdown sans lien avec les sites d'origine ni leurs
+contenus. Aucune exploitation commerciale n'en est faite.
+
+- `Examples/Exemple_1/` : pages de Corsen Academy — Mistral AI
+  (<https://corsen.ai/fr/formations/mistral-ai>), consultées en
+  septembre 2026. © CORSEN AI — tous droits réservés.
+- `Examples/Exemple_2/` : pages « Publications » de la Cour des
+  comptes (<https://www.ccomptes.fr/fr>), consultées en septembre 2026.
+  Source citée conformément aux mentions légales du site ; le propos
+  des textes n'est pas altéré, seuls les éléments d'interface ont
+  été retirés.
+
+Ces contenus restent la propriété de leurs ayants droit respectifs
+et ne sont pas couverts par la licence du présent outil. Toute
+réutilisation des exemples reste soumise aux conditions définies
+par les sites d'origine ; toute demande de retrait sera honorée.
+
 ## Développement
 
 ```powershell
