@@ -35,10 +35,13 @@ def test_contenu_unique_conserve_a_100_pourcents(tmp_path) -> None:
 
     Sont exclus les séparateurs de pages (supprimés par conception,
     clarification Q2 → A) et les lignes uniques uniquement par leurs
-    parties variables (FR-003 : leur forme normalisée est récurrente)."""
+    parties variables (FR-003 : leur forme normalisée est récurrente).
+    Feature 004 (FR-001) : la comparaison s'entend hors destinations de
+    liens ](</...>) retirées par la passe à l'écriture."""
     main([str(ENTREE), "--sortie", str(tmp_path)])
     nettoye = (tmp_path / "001" / "nettoye.md").read_text(encoding="utf-8")
     occurrences = _occurrences(ENTREE.read_text(encoding="utf-8"))
+    from md_cleaner.nettoyage import nettoyer_destinations
     from md_cleaner.normalisation import normaliser_ligne
     from md_cleaner.segmentation import RE_SEPARATEUR
 
@@ -54,7 +57,8 @@ def test_contenu_unique_conserve_a_100_pourcents(tmp_path) -> None:
         and not RE_SEPARATEUR.match(ligne)
         and occurrences_norm[normaliser_ligne(ligne)] == 1
     }
-    assert uniques <= _lignes_non_vides(nettoye)
+    uniques_nettoyes = set(nettoyer_destinations(list(uniques)))
+    assert uniques_nettoyes <= _lignes_non_vides(nettoye)
 
 
 def test_boilerplate_supprime_a_90_pourcents(tmp_path) -> None:

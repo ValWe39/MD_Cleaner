@@ -18,6 +18,7 @@ python -m md_cleaner <fichier.md> ...    # équivalent
 | `--dry-run` | — | désactivé | FR-007 | Mode validation : produit `rapport-dry-run.md` + `suggestion.json` dans le dossier du run, sans écrire de fichier nettoyé |
 | `--suggestion` | chemin | auto | FR-008 | Consomme un `suggestion.json` (édité ou non) au lieu de recalculer ; incohérent avec `--dry-run` |
 | `--pagine` | — | désactivé | FR-009 | Produit en plus `nettoye-pagine.md` (marqueurs lisibles) et `cartographie.json` |
+| `--conserver-liens` | — | nettoyage actif | 004 : FR-002, FR-003 | Conserve les destinations de liens inline `](</...>)` dans `nettoye.md` et `nettoye-pagine.md` ; sans le drapeau, elles sont retirées à l'écriture (feature 004) |
 | `--seuil` | entier 2–100 | 80 | FR-002 | Seuil de fréquence (% de pages) au-delà duquel un motif est proposé à la suppression |
 | `--echantillon` | dossier | auto-calibrage | FR-012 | Calibrage sur un échantillon fourni (≤ 5 fichiers `.md`, triés par nom) |
 | `--calibrage` | entier 2–50 | 5 | FR-013 | Nombre N de premières pages utilisées par l'auto-calibrage |

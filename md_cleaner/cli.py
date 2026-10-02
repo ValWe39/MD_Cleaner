@@ -76,6 +76,11 @@ def construire_analyseur() -> _Analyseur:
         help="produit en plus nettoye-pagine.md et cartographie.json",
     )
     analyseur.add_argument(
+        "--conserver-liens",
+        action="store_true",
+        help="conserve les destinations de liens inline ](</...>) dans les sorties .md",
+    )
+    analyseur.add_argument(
         "--seuil",
         type=_entier_bornes("--seuil", 2, 100),
         default=80,
@@ -202,9 +207,14 @@ def main(argv: list[str] | None = None) -> int:
 
     blocs, avertissements_nettoyage = nettoyer(pages, motifs)
     avertissements.extend(avertissements_nettoyage)
-    ecrire_nettoye(dossier / "nettoye.md", blocs)
+    ecrire_nettoye(dossier / "nettoye.md", blocs, conserver_liens=args.conserver_liens)
     if args.pagine:
-        ecrire_nettoye_pagine(dossier / "nettoye-pagine.md", pages, blocs)
+        ecrire_nettoye_pagine(
+            dossier / "nettoye-pagine.md",
+            pages,
+            blocs,
+            conserver_liens=args.conserver_liens,
+        )
         ecrire_cartographie(
             dossier / "cartographie.json",
             construire_cartographie(fichier.name, mode, pages, blocs),
