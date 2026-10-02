@@ -79,6 +79,7 @@ Les autres paramètres, combinables librement :
 ```powershell
 md-cleaner $fichier --pagine
 md-cleaner $fichier --seuil 95
+md-cleaner $fichier --conserver-liens
 md-cleaner $fichier --dry-run --extrait 12
 md-cleaner $fichier --nom-titre 30
 md-cleaner $fichier --sortie .\mes-sorties
@@ -87,6 +88,8 @@ md-cleaner $fichier --echantillon .\Examples\Exemple_2\1.Sample
 
 ```text
 --pagine        : ajoute nettoye-pagine.md + cartographie.json (RAG)
+--conserver-liens : garde les destinations de liens inline ](</...>)
+                   dans les sorties .md (retirées par défaut)
 --seuil N       : seuil de fréquence en % de pages (défaut 80)
 --nom-titre X   : nomme le run d'après les X premiers caractères du titre
 --sortie D      : dossier racine des sorties (défaut .\output)

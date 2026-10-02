@@ -28,10 +28,10 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 **Purpose**: Tests écrits d'abord (TDD) — ils DOIVENT échouer avant implémentation.
 
-- [ ] T001 [P] [US1] Créer `tests/unit/test_nettoyage_liens.py` : tests de la fonction pure — un lien `[libellé](</chemin>)` devient `[libellé]` (FR-001) ; plusieurs liens sur une même ligne tous retirés (US1, scénario 3) ; libellé vide `[](</chemin>)` → destination retirée, crochets vides conservés ; caractères encodés `%5B`/`%3A` retirés tels quels sans décodage (FR-006) ; `](https://...)` et `](chemin)` inchangés (hors périmètre) ; `<!-- page: 3 -->` inchangé (D5) ; ligne sans `](</...>)` inchangée octet par octet ; idempotence (2e passe = no-op)
-- [ ] T002 [US1] Créer `tests/integration/test_nettoyage_liens.py` : run CLI sur `Examples/Exemple_2/2.Input/consolidated.md` → aucune ligne de `nettoye.md` ne contient `](</` (SC-001), libellés `[texte]` présents, nombre et ordre des lignes inchangés par rapport à un run `--conserver-liens` (SC-002)
-- [ ] T003 [P] [US2] Étendre `tests/integration/test_nettoyage_liens.py` : run avec `--conserver-liens` → destinations intactes ; diff des deux runs limité aux seules sous-chaînes `](</...>)` retirées, reste identique octet par octet (SC-004) ; sur un corpus sans liens, sorties des deux modes identiques octet par octet (SC-003)
-- [ ] T004 [P] [US3] Étendre `tests/integration/test_nettoyage_liens.py` : run `--pagine` → contenu des pages de `nettoye-pagine.md` sans destination, chaque marqueur `<!-- page: N -->` présent et identique, `cartographie.json` identique entre les deux modes (FR-004, FR-005, SC-004)
+- [x] T001 [P] [US1] Créer `tests/unit/test_nettoyage_liens.py` : tests de la fonction pure — un lien `[libellé](</chemin>)` devient `[libellé]` (FR-001) ; plusieurs liens sur une même ligne tous retirés (US1, scénario 3) ; libellé vide `[](</chemin>)` → destination retirée, crochets vides conservés ; caractères encodés `%5B`/`%3A` retirés tels quels sans décodage (FR-006) ; `](https://...)` et `](chemin)` inchangés (hors périmètre) ; `<!-- page: 3 -->` inchangé (D5) ; ligne sans `](</...>)` inchangée octet par octet ; idempotence (2e passe = no-op)
+- [x] T002 [US1] Créer `tests/integration/test_nettoyage_liens.py` : run CLI sur `Examples/Exemple_2/2.Input/consolidated.md` → aucune ligne de `nettoye.md` ne contient `](</` (SC-001), libellés `[texte]` présents, nombre et ordre des lignes inchangés par rapport à un run `--conserver-liens` (SC-002)
+- [x] T003 [P] [US2] Étendre `tests/integration/test_nettoyage_liens.py` : run avec `--conserver-liens` → destinations intactes ; diff des deux runs limité aux seules sous-chaînes `](</...>)` retirées, reste identique octet par octet (SC-004) ; sur un corpus sans liens, sorties des deux modes identiques octet par octet (SC-003)
+- [x] T004 [P] [US3] Étendre `tests/integration/test_nettoyage_liens.py` : run `--pagine` → contenu des pages de `nettoye-pagine.md` sans destination, chaque marqueur `<!-- page: N -->` présent et identique, `cartographie.json` identique entre les deux modes (FR-004, FR-005, SC-004)
 
 **Checkpoint**: les nouveaux tests échouent pour la bonne raison (aucune fonction de retrait n'existe, pas d'option `--conserver-liens`).
 
@@ -45,10 +45,10 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Implémenter la fonction pure dans `md_cleaner/nettoyage.py` : `nettoyer_destinations(lignes)` retire les sous-chaînes `](</...>)` — `](<` + destination sans `>` (le premier `>` referme, aucun chevron imbriqué) + `>)` — sans décoder les caractères encodés, occurrences multiples par ligne, liste de lignes → liste de lignes (D1, D3, FR-001, FR-006)
-- [ ] T006 [US1] Appliquer la passe dans `ecrire_nettoye` de `md_cleaner/nettoyage.py` : sur le texte des blocs avant écriture de `nettoye.md`, active par défaut à chaque run de nettoyage, sans muter les `Bloc` renvoyés par `nettoyer()` ni toucher `cartographie.json` (D2, FR-002, FR-005)
-- [ ] T007 [US1] Migrer `tests/integration/test_nettoyage_simple.py` : mettre à jour les contenus attendus — destinations retirées, libellés conservés (SC-005, migration bornée du plan)
-- [ ] T008 [US1] Vérifier que T001/T002 passent et que la suite complète reste au vert sans relâchement des seuils : `pytest` (SC-005)
+- [x] T005 [US1] Implémenter la fonction pure dans `md_cleaner/nettoyage.py` : `nettoyer_destinations(lignes)` retire les sous-chaînes `](</...>)` — `](<` + destination sans `>` (le premier `>` referme, aucun chevron imbriqué) + `>)` — sans décoder les caractères encodés, occurrences multiples par ligne, liste de lignes → liste de lignes (D1, D3, FR-001, FR-006)
+- [x] T006 [US1] Appliquer la passe dans `ecrire_nettoye` de `md_cleaner/nettoyage.py` : sur le texte des blocs avant écriture de `nettoye.md`, active par défaut à chaque run de nettoyage, sans muter les `Bloc` renvoyés par `nettoyer()` ni toucher `cartographie.json` (D2, FR-002, FR-005)
+- [x] T007 [US1] Migrer `tests/integration/test_nettoyage_simple.py` : mettre à jour les contenus attendus — destinations retirées, libellés conservés (SC-005, migration bornée du plan)
+- [x] T008 [US1] Vérifier que T001/T002 passent et que la suite complète reste au vert sans relâchement des seuils : `pytest` (SC-005)
 
 **Checkpoint**: un run standard produit un `nettoye.md` sans destination ; la suite est au vert.
 
@@ -62,9 +62,9 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Ajouter l'option dans `construire_analyseur` de `md_cleaner/cli.py` : `--conserver-liens`, booléenne sans argument (`store_true`), défaut absent = nettoyage actif, aide en français, codes retour 0-3 inchangés, compatible avec toutes les options existantes (D4, FR-002, FR-003)
-- [ ] T010 [US2] Propager le paramètre dans `md_cleaner/cli.py` et `md_cleaner/nettoyage.py` : argument explicite jusqu'aux writers (pas d'état global) ; avec le drapeau, aucune transformation — sorties identiques octet par octet à avant la feature (D3, D4, FR-003)
-- [ ] T011 [US2] Vérifier que T003 passe et que la suite complète reste au vert : `pytest`
+- [x] T009 [US2] Ajouter l'option dans `construire_analyseur` de `md_cleaner/cli.py` : `--conserver-liens`, booléenne sans argument (`store_true`), défaut absent = nettoyage actif, aide en français, codes retour 0-3 inchangés, compatible avec toutes les options existantes (D4, FR-002, FR-003)
+- [x] T010 [US2] Propager le paramètre dans `md_cleaner/cli.py` et `md_cleaner/nettoyage.py` : argument explicite jusqu'aux writers (pas d'état global) ; avec le drapeau, aucune transformation — sorties identiques octet par octet à avant la feature (D3, D4, FR-003)
+- [x] T011 [US2] Vérifier que T003 passe et que la suite complète reste au vert : `pytest`
 
 **Checkpoint**: `--conserver-liens` rétablit le comportement antérieur ; US1 reste fonctionnel sans le drapeau.
 
@@ -78,8 +78,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Appliquer la passe dans `ecrire_nettoye_pagine` de `md_cleaner/nettoyage.py` : sur le contenu des pages, les marqueurs `---\n\n<!-- page: N -->\n\n` étant générés après la passe par construction (D5, FR-004)
-- [ ] T013 [US3] Vérifier que T004 passe et que la suite complète reste au vert : `pytest`
+- [x] T012 [US3] Appliquer la passe dans `ecrire_nettoye_pagine` de `md_cleaner/nettoyage.py` : sur le contenu des pages, les marqueurs `---\n\n<!-- page: N -->\n\n` étant générés après la passe par construction (D5, FR-004)
+- [x] T013 [US3] Vérifier que T004 passe et que la suite complète reste au vert : `pytest`
 
 **Checkpoint**: les trois stories sont indépendamment fonctionnelles ; la sortie paginée est cohérente avec sa cartographie.
 
@@ -89,10 +89,10 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md de la f
 
 **Purpose**: documentation, contrat et validation de bout en bout.
 
-- [ ] T014 [P] Mettre à jour la table des options dans `specs/001-nettoyage-md-repetitif/contracts/cli.md` : ajouter `--conserver-liens` (révision du contrat par `specs/004-nettoyage-liens-html/contracts/nettoyage-liens.md`)
-- [ ] T015 [P] Documenter l'option dans `README.md` : liste des paramètres et bloc d'exemples (`md-cleaner $fichier --conserver-liens`)
-- [ ] T016 Exécuter les scénarios 1 à 5 de `specs/004-nettoyage-liens-html/quickstart.md` sur `Examples/Exemple_1` et `Examples/Exemple_2` et constater les attendus
-- [ ] T017 Vérification finale : `pytest` au vert et `pre-commit run --all-files` sans échec (SC-005)
+- [x] T014 [P] Mettre à jour la table des options dans `specs/001-nettoyage-md-repetitif/contracts/cli.md` : ajouter `--conserver-liens` (révision du contrat par `specs/004-nettoyage-liens-html/contracts/nettoyage-liens.md`)
+- [x] T015 [P] Documenter l'option dans `README.md` : liste des paramètres et bloc d'exemples (`md-cleaner $fichier --conserver-liens`)
+- [x] T016 Exécuter les scénarios 1 à 5 de `specs/004-nettoyage-liens-html/quickstart.md` sur `Examples/Exemple_1` et `Examples/Exemple_2` et constater les attendus
+- [x] T017 Vérification finale : `pytest` au vert et `pre-commit run --all-files` sans échec (SC-005)
 
 ---
 

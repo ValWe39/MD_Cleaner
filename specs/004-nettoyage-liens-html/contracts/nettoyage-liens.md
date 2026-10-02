@@ -7,9 +7,11 @@
 Appliquée à l'écriture de `nettoye.md` et `nettoye-pagine.md`, sur chaque ligne conservée :
 
 ```text
-cible   : la sous-chaîne ](</...>)  — ](< + destination sans > + >)
-retrait : la sous-chaîne complète, parenthèses et chevrons compris
-restes  : tout le reste de la ligne, identique octet par octet
+cible   : la sous-chaîne (</...>) qui suit le crochet fermant ] du libellé
+          ( ](</...>) = ] + ( + < + destination sans > + > + ) )
+retrait : la sous-chaîne (</...>) complète, parenthèses et chevrons compris
+restes  : le libellé [texte] avec ses crochets, et le reste de la ligne,
+          identiques octet par octet
 ```
 
 Exemple contractuel :

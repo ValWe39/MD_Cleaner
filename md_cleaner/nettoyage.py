@@ -1,11 +1,26 @@
 """Nettoyage des pages et écriture des sorties (FR-004, FR-009, FR-016, D6)."""
 
+import re
 from dataclasses import dataclass
 
 from md_cleaner.detection import Motif
 from md_cleaner.segmentation import Page
 
 SEUIL_QUASI_VIDE = 0.05
+
+RE_DESTINATION_LIEN = re.compile(r"(?<=\])\(</[^>]*>\)")
+
+
+def nettoyer_destinations(lignes: list[str]) -> list[str]:
+    """Retire les destinations de liens inline ](</...>) (FR-001, D1, D3).
+
+    Seule la sous-chaîne (</...>) qui suit le crochet fermant du libellé
+    est retirée, parenthèses et chevrons compris ; le libellé [texte] et
+    le reste de la ligne sont inchangés. Le premier > referme la
+    destination (aucun chevron imbriqué) et les caractères encodés sont
+    emportés sans décodage (FR-006).
+    """
+    return [RE_DESTINATION_LIEN.sub("", ligne) for ligne in lignes]
 
 
 @dataclass
@@ -79,19 +94,31 @@ def _compacter(lignes: list[str]) -> list[str]:
     return resultat
 
 
-def ecrire_nettoye(chemin, blocs: list[Bloc]) -> None:
-    """Écrit le .md nettoyé simple, sans marqueur de page (FR-004)."""
+def ecrire_nettoye(chemin, blocs: list[Bloc], conserver_liens: bool = False) -> None:
+    """Écrit le .md nettoyé simple, sans marqueur de page (FR-004).
+
+    Sans conserver_liens, retire les destinations ](</...>) du texte
+    écrit ; les Blocs ne sont pas mutés (FR-002, FR-005).
+    """
     lignes: list[str] = []
     for bloc in blocs:
-        lignes.extend(bloc.texte)
+        texte = bloc.texte if conserver_liens else nettoyer_destinations(bloc.texte)
+        lignes.extend(texte)
     lignes = _compacter(lignes)
     from pathlib import Path
 
     Path(chemin).write_text("\n".join(lignes) + "\n", encoding="utf-8")
 
 
-def ecrire_nettoye_pagine(chemin, pages: list[Page], blocs: list[Bloc]) -> None:
-    """Écrit le .md paginé : --- + <!-- page: N --> par page (D6, FR-009)."""
+def ecrire_nettoye_pagine(
+    chemin, pages: list[Page], blocs: list[Bloc], conserver_liens: bool = False
+) -> None:
+    """Écrit le .md paginé : --- + <!-- page: N --> par page (D6, FR-009).
+
+    Sans conserver_liens, retire les destinations ](</...>) du contenu
+    des pages ; les marqueurs sont générés après la passe et restent
+    strictement inchangés (FR-004, D5).
+    """
     from pathlib import Path
 
     par_page: dict[int, list[str]] = {}
@@ -99,7 +126,10 @@ def ecrire_nettoye_pagine(chemin, pages: list[Page], blocs: list[Bloc]) -> None:
         par_page.setdefault(bloc.page, []).extend(bloc.texte)
     morceaux: list[str] = []
     for page in pages:
-        contenu = _compacter(par_page.get(page.numero, []))
+        contenu = par_page.get(page.numero, [])
+        if not conserver_liens:
+            contenu = nettoyer_destinations(contenu)
+        contenu = _compacter(contenu)
         if not contenu:
             continue
         morceaux.append(f"---\n\n<!-- page: {page.numero} -->\n\n")
