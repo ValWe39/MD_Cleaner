@@ -2,28 +2,30 @@
 
 **Feature**: 001-nettoyage-md-repetitif | **Date**: 2026-09-29 | **Source**: [spec.md](./spec.md), [research.md](./research.md)
 
-L'outil expose un point d'entrée unique en ligne de commande. Un run = un fichier d'entrée (FR-001). Tout traitement est local et hors-ligne.
+L'outil expose un point d'entrée unique en ligne de commande. Un run = un fichier d'entrée (FR-001), révisé par la feature 007 : une invocation accepte une ou plusieurs entrées ; depuis la feature 008, une invocation produit un seul dossier de run partagé (`specs/008-dossier-sorties-lot/contracts/dossier-de-lot.md`). Tout traitement est local et hors-ligne.
 
 ## Point d'entrée
 
 ```text
-md-cleaner <fichier.md> [options]        # console script
-python -m md_cleaner <fichier.md> ...    # équivalent
+md-cleaner <entrée> [<entrée> ...] [options]      # console script (007 : multi-entrées)
+python -m md_cleaner <entrée> ...                 # équivalent
 ```
+
+Une entrée est un fichier `.md` ou un dossier (seuls les `.md` de premier niveau sont retenus, triés par nom). Une invocation sans entrée est un usage invalide (code 3). Règles complètes du lot (ordre, doublons, options neutralisées, échecs) : `specs/007-traitement-multi-documents/contracts/multi-entrees.md`.
 
 ## Options
 
 | Option | Argument | Défaut | Exigence | Description |
 | ------ | -------- | ------ | -------- | ----------- |
-| `--dry-run` | — | désactivé | FR-007 | Mode validation : produit `rapport-dry-run.md` + `suggestion.json` dans le dossier du run, sans écrire de fichier nettoyé |
-| `--suggestion` | chemin | auto | FR-008 | Consomme un `suggestion.json` (édité ou non) au lieu de recalculer ; incohérent avec `--dry-run` |
+| `--dry-run` | — | désactivé | FR-007 ; 007 : FR-006 | Mode validation : produit `rapport-dry-run.md` + `suggestion.json` dans le dossier du run, sans écrire de fichier nettoyé ; en lot de plusieurs documents, l'option est neutralisée avec avertissement |
+| `--suggestion` | chemin | auto | FR-008 ; 007 : FR-006 | Consomme un `suggestion.json` (édité ou non) au lieu de recalculer ; incohérent avec `--dry-run` ; en lot de plusieurs documents, l'option est neutralisée avec avertissement |
 | `--pagine` | — | désactivé | FR-009 | Produit en plus `nettoye-pagine.md` (marqueurs lisibles) et `cartographie.json` |
 | `--conserver-liens` | — | nettoyage actif | 004 : FR-002, FR-003 ; 005 : FR-004 | Conserve les destinations de liens inline `](<...>)` (tout schéma, titre éventuel compris) dans `nettoye.md` et `nettoye-pagine.md` ; sans le drapeau, elles sont retirées à l'écriture (features 004 et 005) |
 | `--seuil` | entier 2–100 | 80 | FR-002 | Seuil de fréquence (% de pages) au-delà duquel un motif est proposé à la suppression |
 | `--echantillon` | dossier | auto-calibrage | FR-012 | Calibrage sur un échantillon fourni (≤ 5 fichiers `.md`, triés par nom) |
 | `--calibrage` | entier 2–50 | 5 | FR-013 | Nombre N de premières pages utilisées par l'auto-calibrage |
 | `--sortie` | dossier | `./output` | FR-006 | Dossier racine des sorties |
-| `--nom-titre` | entier 5–100 | numérotation | FR-006 | Nomme le sous-dossier du run d'après les X premiers caractères du slug du titre |
+| `--nom-titre` | entier 5–100 | numérotation | FR-006 ; 008 : FR-005 | Nomme le sous-dossier du run d'après les X premiers caractères du slug du titre (mono-document) ; neutralisée avec avertissement en lot de plusieurs |
 
 ## Comportements par défaut (suggestion par défaut = saut du dry-run)
 
@@ -53,10 +55,10 @@ suffixe `-nettoye`, collision suffixée `-1`, `-2`, ...) — règle complète :
 
 | Code | Signification |
 | ---- | ------------- |
-| 0 | Succès (y compris dry-run avec avertissements) |
-| 1 | Entrée invalide : fichier absent, illisible, non-`.md`, dossier de sortie non créable |
+| 0 | Succès (y compris dry-run avec avertissements) ; en lot : tous les documents ont réussi (007 : FR-007) |
+| 1 | Entrée invalide : fichier absent, illisible, non-`.md`, dossier de sortie non créable ; en lot : au moins un document en échec ou lot vide |
 | 2 | Artefact fourni invalide : `suggestion.json` invalide ou incohérent, `--echantillon` vide ou > 5 fichiers |
-| 3 | Usage invalide : combinaison d'options interdite, argument hors bornes |
+| 3 | Usage invalide : combinaison d'options interdite, argument hors bornes, aucune entrée |
 
 ## Exemples
 
@@ -72,6 +74,9 @@ md-cleaner consolidated.md --suggestion output/001/suggestion.json
 
 # Sortie paginée pour RAG, seuil plus strict, run nommé d'après le titre
 md-cleaner consolidated.md --pagine --seuil 90 --nom-titre 30
+
+# Lot multi-documents (feature 007)
+md-cleaner doc1.md doc2.md dossierA
 ```
 
 Les formats des fichiers échangés (`suggestion.json`, `cartographie.json`) sont spécifiés dans [formats.md](./formats.md).

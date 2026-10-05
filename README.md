@@ -107,6 +107,42 @@ Contrat CLI complet : `specs/001-nettoyage-md-repetitif/contracts/cli.md`.
 Règle de nommage du fichier nettoyé :
 `specs/006-nom-sortie-source/contracts/nommage-sortie.md`.
 
+## Traiter plusieurs documents (feature 007)
+
+Une invocation accepte plusieurs documents à la suite — des fichiers
+`.md`, des dossiers, ou un mélange :
+
+```powershell
+md-cleaner doc1.md doc2.md doc3.md
+md-cleaner dossierA          # seuls les .md du premier niveau, triés par nom
+md-cleaner doc1.md dossierA   # doc1, puis les .md du dossier
+```
+
+Chaque document est traité avec les mêmes paramètres de cleaning, dans
+l'ordre des arguments, et **toutes les sorties de l'invocation vont dans
+un seul et même dossier de run numéroté** (`output\00X`). Les doublons
+sont traités à chaque occurrence (sorties suffixées `-1`, `-2`, jamais
+d'écrasement).
+
+Points d'attention :
+
+- En lot de plusieurs avec `--pagine`, les sorties secondaires sont
+  préfixées par le nom du document : `doc-nettoye-pagine.md`,
+  `doc-cartographie.json` (noms courts inchangés pour un seul document).
+- `--dry-run`, `--suggestion` et `--nom-titre` ne s'appliquent qu'à un
+  lot d'un seul document ; en lot de plusieurs, elles sont neutralisées
+  avec un avertissement explicite et le lot est nettoyé (dossier
+  numéroté pour `--nom-titre`).
+- Un document en échec est signalé (`ERREUR : ...` sur stderr) et le
+  lot poursuit ; au troisième échec consécutif, le lot s'arrête net.
+- Code retour : 0 si tous les documents ont réussi, 1 sinon.
+- Un dossier sans fichier `.md` est ignoré avec un message ; si aucun
+  document n'est retenu, l'invocation échoue (code 1).
+
+Règles complètes :
+`specs/007-traitement-multi-documents/contracts/multi-entrees.md` et
+`specs/008-dossier-sorties-lot/contracts/dossier-de-lot.md`.
+
 ## Notes de version
 
 Les ids de motifs (M01, M02, ...) ne sont pas stables entre versions de
