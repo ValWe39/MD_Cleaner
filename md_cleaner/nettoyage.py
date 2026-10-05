@@ -8,17 +8,23 @@ from md_cleaner.segmentation import Page
 
 SEUIL_QUASI_VIDE = 0.05
 
-RE_DESTINATION_LIEN = re.compile(r"(?<=\])\(</[^>]*>\)")
+RE_DESTINATION_LIEN = re.compile(r'(?<=\])\(<[^>]*>(?: "[^"]*")?\)')
 
 
 def nettoyer_destinations(lignes: list[str]) -> list[str]:
-    """Retire les destinations de liens inline ](</...>) (FR-001, D1, D3).
+    """Retire les destinations de liens inline ](<...>) (FR-001, FR-002, D1, D2).
 
-    Seule la sous-chaîne (</...>) qui suit le crochet fermant du libellé
-    est retirée, parenthèses et chevrons compris ; le libellé [texte] et
-    le reste de la ligne sont inchangés. Le premier > referme la
-    destination (aucun chevron imbriqué) et les caractères encodés sont
-    emportés sans décodage (FR-006).
+    Seule la sous-chaîne (<...>) qui suit le crochet fermant du libellé est
+    retirée, parenthèses et chevrons compris, quel que soit le schéma de la
+    destination (relatif, http, https, mailto, tel, ftp... — règle unifiée
+    sans cas particulier) ; le titre éventuel de la forme ](<url> "titre")
+    est emporté avec la destination, espace et guillemets compris — seuls
+    les libellés survivent ; le libellé [texte] et le reste de la ligne
+    sont inchangés. Le premier > referme la destination (aucun chevron
+    imbriqué) et les caractères encodés sont emportés sans décodage
+    (FR-006). Un titre contenant un guillemet interne échappé (\\") arrête
+    le match avant la parenthèse fermante : la ligne reste inchangée,
+    sans corruption (limite documentée, D2).
     """
     return [RE_DESTINATION_LIEN.sub("", ligne) for ligne in lignes]
 

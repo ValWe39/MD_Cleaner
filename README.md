@@ -88,8 +88,8 @@ md-cleaner $fichier --echantillon .\Examples\Exemple_2\1.Sample
 
 ```text
 --pagine        : ajoute nettoye-pagine.md + cartographie.json (RAG)
---conserver-liens : garde les destinations de liens inline ](</...>)
-                   dans les sorties .md (retirées par défaut)
+--conserver-liens : garde les destinations de liens inline ](<...>), tout
+                   schéma confondu, dans les sorties .md (retirées par défaut)
 --seuil N       : seuil de fréquence en % de pages (défaut 80)
 --nom-titre X   : nomme le run d'après les X premiers caractères du titre
 --sortie D      : dossier racine des sorties (défaut .\output)
