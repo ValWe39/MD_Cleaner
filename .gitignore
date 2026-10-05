@@ -13,6 +13,7 @@ Prompts/
 # Ignorer le contenu de .specify sauf memory/ (constitution versionnée)
 .specify/*
 !.specify/memory/
+!.specify/assessments/
 .specify/memory/.*
 
 # Python (artefacts locaux)
