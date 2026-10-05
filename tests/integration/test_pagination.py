@@ -14,7 +14,7 @@ def test_marqueurs_et_cartographie_coherents(tmp_path) -> None:
     assert code == CODE_OK
     dossier = tmp_path / "001"
     pagine = (dossier / "nettoye-pagine.md").read_text(encoding="utf-8")
-    simple = (dossier / "nettoye.md").read_text(encoding="utf-8")
+    simple = (dossier / "consolidated-nettoye.md").read_text(encoding="utf-8")
     carto = json.loads((dossier / "cartographie.json").read_text(encoding="utf-8"))
 
     assert carto["version"] == 1

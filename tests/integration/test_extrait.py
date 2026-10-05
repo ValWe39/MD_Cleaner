@@ -44,7 +44,7 @@ def test_extrait_sans_dry_run_sans_effet(tmp_path) -> None:
     code = main([str(EXEMPLE_1), "--extrait", "12", "--sortie", str(tmp_path)])
     assert code == CODE_OK
     assert not list(tmp_path.rglob("suggestion.json"))
-    assert (tmp_path / "001" / "nettoye.md").is_file()
+    assert (tmp_path / "001" / "consolidated-nettoye.md").is_file()
 
 
 def test_extrait_n_exact(tmp_path) -> None:
@@ -168,4 +168,4 @@ def test_suggestion_sans_position_consommable(tmp_path) -> None:
         [str(EXEMPLE_2), "--suggestion", str(chemin), "--sortie", str(tmp_path / "net")]
     )
     assert code == CODE_OK
-    assert (tmp_path / "net" / "001" / "nettoye.md").is_file()
+    assert (tmp_path / "net" / "001" / "consolidated-nettoye.md").is_file()

@@ -97,7 +97,9 @@ def test_bascule_ciblee_filtres_supprimes_metadata_conservees(tmp_path) -> None:
         [str(EXEMPLE_2), "--suggestion", str(chemin), "--sortie", str(tmp_path / "net")]
     )
     assert code == CODE_OK
-    nettoye = (tmp_path / "net" / "001" / "nettoye.md").read_text(encoding="utf-8")
+    nettoye = (tmp_path / "net" / "001" / "consolidated-nettoye.md").read_text(
+        encoding="utf-8"
+    )
     assert "Filtres actifs" not in nettoye, "les filtres doivent être supprimés"
     assert "COUR DES COMPTES" in nettoye, (
         "le marqueur d'institution des publications doit être conservé"

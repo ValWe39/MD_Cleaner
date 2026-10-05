@@ -45,10 +45,15 @@ md-cleaner $fichier
 ```
 
 Le résultat est créé dans un sous-dossier numéroté de `output`
-(001, puis 002 au run suivant, etc.). Ouvrez-le :
+(001, puis 002 au run suivant, etc.). Le fichier nettoyé est nommé
+d'après le document d'entrée : les 20 premiers caractères de son nom,
+espaces remplacées par `_`, suivis du suffixe `-nettoye`
+(`consolidated.md` → `consolidated-nettoye.md`). En cas de conflit
+de nom, un numéro est ajouté à la fin (`-nettoye-1.md`, jamais
+d'écrasement). Ouvrez-le :
 
 ```powershell
-notepad .\output\001\nettoye.md
+notepad .\output\001\consolidated-nettoye.md
 ```
 
 ### Étape 3 — Jouer sur les paramètres
@@ -99,6 +104,8 @@ md-cleaner $fichier --echantillon .\Examples\Exemple_2\1.Sample
 ```
 
 Contrat CLI complet : `specs/001-nettoyage-md-repetitif/contracts/cli.md`.
+Règle de nommage du fichier nettoyé :
+`specs/006-nom-sortie-source/contracts/nommage-sortie.md`.
 
 ## Notes de version
 

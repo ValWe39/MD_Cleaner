@@ -26,3 +26,19 @@ def creer_dossier_run(racine: Path, titre: str, nom_titre: int | None) -> Path:
     dossier = racine / candidat
     dossier.mkdir(parents=True)
     return dossier
+
+
+def resoudre_chemin_nettoye(dossier: Path, nom: str) -> Path:
+    """Premier chemin libre pour le fichier nettoyé (006, D4, FR-004).
+
+    Essaie ``<nom>.md``, puis ``<nom>-1.md``, ``<nom>-2.md``, ... par ordre
+    de traitement ; le suffixe de collision est ajouté à la fin du nom,
+    avant l'extension. Retourne un chemin libre sans jamais écraser un
+    fichier existant (SC-003).
+    """
+    candidat = dossier / f"{nom}.md"
+    indice = 1
+    while candidat.exists():
+        candidat = dossier / f"{nom}-{indice}.md"
+        indice += 1
+    return candidat
