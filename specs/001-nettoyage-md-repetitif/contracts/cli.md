@@ -35,9 +35,14 @@ python -m md_cleaner <fichier.md> ...    # équivalent
 
 | Mode | Fichiers dans `output/<run>/` |
 | ---- | ----------------------------- |
-| nettoyage simple | `nettoye.md` |
-| nettoyage + `--pagine` | `nettoye.md`, `nettoye-pagine.md`, `cartographie.json` |
+| nettoyage simple | `<nom-dérivé>-nettoye.md` |
+| nettoyage + `--pagine` | `<nom-dérivé>-nettoye.md`, `nettoye-pagine.md`, `cartographie.json` |
 | `--dry-run` | `rapport-dry-run.md`, `suggestion.json` |
+
+Depuis la feature 006, le fichier nettoyé est nommé d'après le document
+d'entrée (20 premiers caractères du nom, espaces remplacées par `_`,
+suffixe `-nettoye`, collision suffixée `-1`, `-2`, ...) — règle complète :
+`specs/006-nom-sortie-source/contracts/nommage-sortie.md`.
 
 ## Messages et rapports
 

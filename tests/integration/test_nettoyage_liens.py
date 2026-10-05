@@ -39,8 +39,9 @@ def _corpus_sans_liens(tmp_path) -> Path:
     return chemin
 
 
-def _nettoye(racine, run: str = "001") -> str:
-    return (racine / run / "nettoye.md").read_text(encoding="utf-8")
+def _nettoye(racine, run: str = "001", nom: str = "consolidated-nettoye.md") -> str:
+    """Lecture du fichier nettoyé, nommé d'après l'entrée (feature 006)."""
+    return (racine / run / nom).read_text(encoding="utf-8")
 
 
 def test_run_standard_sans_destination(tmp_path) -> None:
@@ -85,8 +86,8 @@ def test_corpus_sans_liens_sorties_identiques(tmp_path) -> None:
         main([str(entree), "--conserver-liens", "--sortie", str(tmp_path / "brut")])
         == CODE_OK
     )
-    assert (tmp_path / "defaut" / "001" / "nettoye.md").read_bytes() == (
-        tmp_path / "brut" / "001" / "nettoye.md"
+    assert (tmp_path / "defaut" / "001" / "sans-liens-nettoye.md").read_bytes() == (
+        tmp_path / "brut" / "001" / "sans-liens-nettoye.md"
     ).read_bytes()
 
 
@@ -155,7 +156,7 @@ def test_urls_nues_intactes_et_lien_absolu_retire(tmp_path) -> None:
     absolu nettoyé."""
     entree = _document_garde_fou(tmp_path)
     assert main([str(entree), "--sortie", str(tmp_path / "run")]) == CODE_OK
-    nettoye = _nettoye(tmp_path / "run")
+    nettoye = _nettoye(tmp_path / "run", nom="garde-fou-nettoye.md")
     assert "https://api.mistral.ai" in nettoye
     assert "La documentation officielle est sur https://docs.mistral.ai/api." in nettoye
     assert "[Try Studio ](<" not in nettoye
@@ -166,7 +167,7 @@ def test_run_exemple_3_sans_destination(tmp_path) -> None:
     """SC-001 (T004) : aucune ligne du nettoye.md ne contient ](<, les
     libellés absolus restent en place."""
     assert main([str(EXEMPLE_3), "--sortie", str(tmp_path)]) == CODE_OK
-    nettoye = _nettoye(tmp_path)
+    nettoye = _nettoye(tmp_path, nom="retry-failed-records-nettoye.md")
     assert "](<" not in nettoye
     assert "[Reach out]" in nettoye
     assert "[Try Studio ]" in nettoye
@@ -181,8 +182,12 @@ def test_exemple_3_lignes_et_ordre_inchanges_vs_conserver(tmp_path) -> None:
         main([str(EXEMPLE_3), "--conserver-liens", "--sortie", str(tmp_path / "brut")])
         == CODE_OK
     )
-    propre = _nettoye(tmp_path / "defaut").splitlines()
-    brut = _nettoye(tmp_path / "brut").splitlines()
+    propre = _nettoye(
+        tmp_path / "defaut", nom="retry-failed-records-nettoye.md"
+    ).splitlines()
+    brut = _nettoye(
+        tmp_path / "brut", nom="retry-failed-records-nettoye.md"
+    ).splitlines()
     assert len(propre) == len(brut)
     assert propre == [_RE_DESTINATION.sub("", ligne) for ligne in brut]
 
@@ -214,7 +219,7 @@ def test_conserver_liens_garde_les_destinations_absolues(tmp_path) -> None:
         main([str(EXEMPLE_3), "--conserver-liens", "--sortie", str(tmp_path / "brut")])
         == CODE_OK
     )
-    brut = _nettoye(tmp_path / "brut")
+    brut = _nettoye(tmp_path / "brut", nom="retry-failed-records-nettoye.md")
     assert "](<https://mistral.ai/about>)" in brut
     assert "](<https://console.mistral.ai?utm_source=docs" in brut
 

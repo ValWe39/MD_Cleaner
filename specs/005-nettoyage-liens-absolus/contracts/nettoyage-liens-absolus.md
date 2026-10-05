@@ -4,7 +4,7 @@
 
 ## Règle de transformation (FR-001, FR-002, FR-006)
 
-Appliquée à l'écriture de `nettoye.md` et `nettoye-pagine.md`, sur chaque ligne conservée :
+Appliquée à l'écriture du fichier nettoyé (`<nom-dérivé>-nettoye.md`, feature 006) et de `nettoye-pagine.md`, sur chaque ligne conservée :
 
 ```text
 cible   : la sous-chaîne (<...>) qui suit le crochet fermant ] du libellé,
@@ -49,7 +49,7 @@ Bornes de la règle :
 
 | Option | Argument | Défaut | Exigence | Description |
 | ------ | -------- | ------ | -------- | ----------- |
-| `--conserver-liens` | — | nettoyage actif | FR-004 | Désactive le retrait de **toutes** les destinations (relatives et absolues, titres compris) : `nettoye.md` et `nettoye-pagine.md` conservent les liens inline tels quels, identiques octet par octet à une sortie produite sans la feature |
+| `--conserver-liens` | — | nettoyage actif | FR-004 | Désactive le retrait de **toutes** les destinations (relatives et absolues, titres compris) : le fichier nettoyé et `nettoye-pagine.md` conservent les liens inline tels quels, identiques octet par octet à une sortie produite sans la feature |
 
 - Aucune option ajoutée ni modifiée ; la sémantique du drapeau existant s'étend de fait aux destinations absolues (arbitrage decide 2026-10-05).
 - `--dry-run` : aucun effet observable (aucune sortie nettoyée n'est écrite ; la suggestion et le rapport restent identiques, FR-005).
@@ -58,7 +58,7 @@ Bornes de la règle :
 
 | Artefact | Nettoyé ? |
 | -------- | --------- |
-| `nettoye.md` | oui |
+| le fichier nettoyé (`<nom-dérivé>-nettoye.md`) | oui |
 | `nettoye-pagine.md` | oui (contenu des pages ; marqueurs `<!-- page: N -->` générés intacts) |
 | `suggestion.json` (extraits) | non |
 | `rapport-dry-run.md` (extraits) | non |
@@ -70,7 +70,7 @@ Inchangés (contrat CLI de la feature 001) : 0/1/2/3 ; aucun message, avertissem
 
 ## Garanties vérifiables
 
-- Sur un run Exemple_3 : aucune ligne de `nettoye.md` ne contient `](<` (SC-001, baseline 6/299 au run 009).
+- Sur un run Exemple_3 : aucune ligne du fichier nettoyé ne contient `](<` (SC-001, baseline 6/299 au run 009).
 - Sur Exemple_1 et Exemple_2 : sorties par défaut identiques octet par octet aux runs équivalents 004 (SC-003).
 - Sur un document construit avec URLs nues (bloc de code, corps du texte) : URLs intactes octet par octet (SC-005).
 - Avec `--conserver-liens` : toutes les sorties identiques octet par octet à avant la feature (SC-004).

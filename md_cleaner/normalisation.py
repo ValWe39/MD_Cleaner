@@ -41,3 +41,17 @@ def slug_titre(texte: str, x: int) -> str:
     s = s.lower()
     s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
     return s[:x]
+
+
+def nom_sortie_nettoye(stem: str) -> str:
+    """Nom du fichier nettoyé dérivé du stem du document d'entrée (006, D1-D3).
+
+    Les 20 premiers caractères (points de code) du stem, chaque blanc
+    (espace U+0020, tabulation U+0009) remplacé par exactement un ``_``
+    — ni compression des séquences, ni décapage aux extrémités — suivi du
+    suffixe invariable ``-nettoye`` (FR-001 à FR-003) ; tout autre
+    caractère est conservé tel quel. L'extension ``.md`` est ajoutée par
+    l'appelant (contracts/nommage-sortie.md).
+    """
+    base = stem.replace(" ", "_").replace("\t", "_")[:20]
+    return f"{base}-nettoye"

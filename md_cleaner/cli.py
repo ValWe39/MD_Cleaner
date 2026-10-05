@@ -11,8 +11,9 @@ from pathlib import Path
 from md_cleaner.cartographie import construire_cartographie, ecrire_cartographie
 from md_cleaner.detection import ErreurEchantillon, charger_echantillon, detecter
 from md_cleaner.nettoyage import ecrire_nettoye, ecrire_nettoye_pagine, nettoyer
+from md_cleaner.normalisation import nom_sortie_nettoye
 from md_cleaner.segmentation import segmenter
-from md_cleaner.sortie import creer_dossier_run
+from md_cleaner.sortie import creer_dossier_run, resoudre_chemin_nettoye
 from md_cleaner.suggestion import (
     ErreurSuggestion,
     appliquer_actions,
@@ -207,7 +208,10 @@ def main(argv: list[str] | None = None) -> int:
 
     blocs, avertissements_nettoyage = nettoyer(pages, motifs)
     avertissements.extend(avertissements_nettoyage)
-    ecrire_nettoye(dossier / "nettoye.md", blocs, conserver_liens=args.conserver_liens)
+    # Nom de sortie dérivé du document d'entrée (feature 006, FR-001, FR-006) ;
+    # collision résolue par suffixe -1, -2, ... jamais d'écrasement (FR-004)
+    chemin_nettoye = resoudre_chemin_nettoye(dossier, nom_sortie_nettoye(fichier.stem))
+    ecrire_nettoye(chemin_nettoye, blocs, conserver_liens=args.conserver_liens)
     if args.pagine:
         ecrire_nettoye_pagine(
             dossier / "nettoye-pagine.md",
@@ -219,7 +223,7 @@ def main(argv: list[str] | None = None) -> int:
             dossier / "cartographie.json",
             construire_cartographie(fichier.name, mode, pages, blocs),
         )
-    print(f"Sortie : {dossier / 'nettoye.md'}")
+    print(f"Sortie : {chemin_nettoye}")
     if args.pagine:
         print(f"Sortie paginée : {dossier / 'nettoye-pagine.md'}")
         print(f"Cartographie : {dossier / 'cartographie.json'}")

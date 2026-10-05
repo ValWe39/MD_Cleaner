@@ -4,7 +4,7 @@
 
 ## Règle de transformation (FR-001, FR-006)
 
-Appliquée à l'écriture de `nettoye.md` et `nettoye-pagine.md`, sur chaque ligne conservée :
+Appliquée à l'écriture du fichier nettoyé (`<nom-dérivé>-nettoye.md`, feature 006) et de `nettoye-pagine.md`, sur chaque ligne conservée :
 
 ```text
 cible   : la sous-chaîne (</...>) qui suit le crochet fermant ] du libellé
@@ -35,7 +35,7 @@ Bornes de la règle :
 
 | Option | Argument | Défaut | Exigence | Description |
 | ------ | -------- | ------ | -------- | ----------- |
-| `--conserver-liens` | — | nettoyage actif | FR-002, FR-003 | Désactive le retrait des destinations : `nettoye.md` et `nettoye-pagine.md` conservent les liens inline tels quels, identiques octet par octet à une sortie produite sans la feature |
+| `--conserver-liens` | — | nettoyage actif | FR-002, FR-003 | Désactive le retrait des destinations : le fichier nettoyé et `nettoye-pagine.md` conservent les liens inline tels quels, identiques octet par octet à une sortie produite sans la feature |
 
 - Booléenne sans argument, même pattern que `--pagine` ; compatible avec toutes les autres options (`--pagine`, `--suggestion`, `--seuil`, …).
 - Sans le drapeau : la passe est active à chaque run de nettoyage (y compris avec `--suggestion`).
@@ -45,7 +45,7 @@ Bornes de la règle :
 
 | Artefact | Nettoyé ? |
 | -------- | --------- |
-| `nettoye.md` | oui |
+| le fichier nettoyé (`<nom-dérivé>-nettoye.md`) | oui |
 | `nettoye-pagine.md` | oui (contenu des pages ; marqueurs `<!-- page: N -->` générés intacts) |
 | `suggestion.json` (extraits) | non |
 | `rapport-dry-run.md` (extraits) | non |

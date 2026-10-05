@@ -13,7 +13,7 @@ def _lignes_supprimees(sortie: Path) -> set[str]:
     """Lignes de l'entrée absentes de la sortie nettoyée."""
     from tests.integration.test_nettoyage_simple import _lignes_non_vides
 
-    nettoye = (sortie / "001" / "nettoye.md").read_text(encoding="utf-8")
+    nettoye = (sortie / "001" / "consolidated-nettoye.md").read_text(encoding="utf-8")
     return _lignes_non_vides(ENTREE.read_text(encoding="utf-8")) - _lignes_non_vides(
         nettoye
     )
