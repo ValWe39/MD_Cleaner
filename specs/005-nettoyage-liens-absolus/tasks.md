@@ -28,11 +28,11 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md, sectio
 
 **Purpose**: Tests écrits d'abord (TDD) — ils DOIVENT échouer avant implémentation.
 
-- [ ] T001 [P] [US1] Étendre `tests/unit/test_nettoyage_liens.py` : `[Try Studio ](<https://console.mistral.ai?utm_source=docs&utm_medium=header_cta>)` devient `[Try Studio ]` (FR-001) ; `](<http://...>)` idem ; `[Contact](<mailto:contact@exemple.fr>)` et `](<tel:+33123456789>)` retirés — même règle, aucun cas particulier (clarification 2026-10-05, option A) ; plusieurs liens absolus sur une même ligne tous retirés (US1, scénario 3) ; `[](<https://exemple.fr>)` → destination retirée, crochets vides conservés ; `](https://exemple.fr)` sans chevrons et `](chemin)` nu inchangés (hors périmètre) ; URL nue dans le texte et `<!-- page: 3 -->` inchangés ; idempotence (2e passe = no-op)
-- [ ] T002 [P] [US3] Étendre `tests/unit/test_nettoyage_liens.py` (formes à titre) : `[HCFP](<http://www.hcfp.fr/> "Haut Conseil des finances publiques \(HCFP\)\(nouvelle fenêtre\)")` devient `[HCFP]` (FR-002) ; titre court et titre avec échappements emportés tels quels ; lien relatif à titre `](</chemin> "titre")` → libellé seul (US3, scénario 2) ; cas limite D2 : titre contenant un guillemet interne échappé (`\"`) → ligne inchangée (non matché, sans corruption)
-- [ ] T003 [P] [US2] Étendre `tests/integration/test_nettoyage_liens.py` : document construit multi-pages contenant un bloc de code avec URL nue (`client = Mistral(api_key=...)`, `https://api.mistral.ai`) et une phrase avec URL nue hors syntaxe de lien → toutes les URLs nues intactes octet par octet dans `nettoye.md` (FR-007, SC-005)
-- [ ] T004 [US1] Étendre `tests/integration/test_nettoyage_liens.py` : run CLI sur `Examples/Exemple_3/2.Input/retry-failed-records.md` → aucune ligne de `nettoye.md` ne contient `](<` (SC-001, baseline 6/299), libellés `[Reach out]`, `[Try Studio ]`, `[Discord↗]` présents, nombre et ordre des lignes inchangés par rapport à un run `--conserver-liens` (SC-002)
-- [ ] T005 [P] [US4] Étendre `tests/integration/test_nettoyage_liens.py` : neutralité — sorties par défaut sur `Examples/Exemple_1/2.Input/consolidated.md` et `Examples/Exemple_2/2.Input/consolidated.md` identiques octet par octet aux sorties de la version 004 (SC-003) ; `--conserver-liens` conserve destinations absolues et titres, sorties identiques octet par octet à avant la feature (SC-004) ; `--pagine` → marqueurs `<!-- page: N -->` présents à l'identique et `cartographie.json` identique entre les deux modes (FR-003) ; `--dry-run` → `suggestion.json` et `rapport-dry-run.md` inchangés (FR-005)
+- [x] T001 [P] [US1] Étendre `tests/unit/test_nettoyage_liens.py` : `[Try Studio ](<https://console.mistral.ai?utm_source=docs&utm_medium=header_cta>)` devient `[Try Studio ]` (FR-001) ; `](<http://...>)` idem ; `[Contact](<mailto:contact@exemple.fr>)` et `](<tel:+33123456789>)` retirés — même règle, aucun cas particulier (clarification 2026-10-05, option A) ; plusieurs liens absolus sur une même ligne tous retirés (US1, scénario 3) ; `[](<https://exemple.fr>)` → destination retirée, crochets vides conservés ; `](https://exemple.fr)` sans chevrons et `](chemin)` nu inchangés (hors périmètre) ; URL nue dans le texte et `<!-- page: 3 -->` inchangés ; idempotence (2e passe = no-op)
+- [x] T002 [P] [US3] Étendre `tests/unit/test_nettoyage_liens.py` (formes à titre) : `[HCFP](<http://www.hcfp.fr/> "Haut Conseil des finances publiques \(HCFP\)\(nouvelle fenêtre\)")` devient `[HCFP]` (FR-002) ; titre court et titre avec échappements emportés tels quels ; lien relatif à titre `](</chemin> "titre")` → libellé seul (US3, scénario 2) ; cas limite D2 : titre contenant un guillemet interne échappé (`\"`) → ligne inchangée (non matché, sans corruption)
+- [x] T003 [P] [US2] Étendre `tests/integration/test_nettoyage_liens.py` : document construit multi-pages contenant un bloc de code avec URL nue (`client = Mistral(api_key=...)`, `https://api.mistral.ai`) et une phrase avec URL nue hors syntaxe de lien → toutes les URLs nues intactes octet par octet dans `nettoye.md` (FR-007, SC-005)
+- [x] T004 [US1] Étendre `tests/integration/test_nettoyage_liens.py` : run CLI sur `Examples/Exemple_3/2.Input/retry-failed-records.md` → aucune ligne de `nettoye.md` ne contient `](<` (SC-001, baseline 6/299), libellés `[Reach out]`, `[Try Studio ]`, `[Discord↗]` présents, nombre et ordre des lignes inchangés par rapport à un run `--conserver-liens` (SC-002)
+- [x] T005 [P] [US4] Étendre `tests/integration/test_nettoyage_liens.py` : neutralité — sorties par défaut sur `Examples/Exemple_1/2.Input/consolidated.md` et `Examples/Exemple_2/2.Input/consolidated.md` identiques octet par octet aux sorties de la version 004 (SC-003) ; `--conserver-liens` conserve destinations absolues et titres, sorties identiques octet par octet à avant la feature (SC-004) ; `--pagine` → marqueurs `<!-- page: N -->` présents à l'identique et `cartographie.json` identique entre les deux modes (FR-003) ; `--dry-run` → `suggestion.json` et `rapport-dry-run.md` inchangés (FR-005)
 
 **Checkpoint**: les nouveaux tests échouent pour la bonne raison (la règle en place ne couvre toujours que `](</...>)` : les formes absolues sans `/` et les titres ne sont pas retirés ; les garde-fous, eux, doivent déjà passer).
 
@@ -46,8 +46,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md, sectio
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Remplacer la regex de `nettoyer_destinations` dans `md_cleaner/nettoyage.py` : `(?<=\])\(</[^>]*>\)` → `(?<=\])\(<[^>]*>\)` — toute destination entre chevrons sans distinction de schéma, le premier `>` refermant toujours, sans décodage des caractères encodés, occurrences multiples par ligne (D1, FR-001, FR-006) ; mettre à jour la docstring de la fonction (formes couvertes, référence à la règle unifiée)
-- [ ] T007 [US1] Vérifier que T001 et T004 passent et que la suite complète reste au vert sans relâchement des seuils : `pytest` (SC-007) — les tests 004 doivent rester verts sans modification (règle en sur-ensemble, D6)
+- [x] T006 [US1] Remplacer la regex de `nettoyer_destinations` dans `md_cleaner/nettoyage.py` : `(?<=\])\(</[^>]*>\)` → `(?<=\])\(<[^>]*>\)` — toute destination entre chevrons sans distinction de schéma, le premier `>` refermant toujours, sans décodage des caractères encodés, occurrences multiples par ligne (D1, FR-001, FR-006) ; mettre à jour la docstring de la fonction (formes couvertes, référence à la règle unifiée)
+- [x] T007 [US1] Vérifier que T001 et T004 passent et que la suite complète reste au vert sans relâchement des seuils : `pytest` (SC-007) — les tests 004 doivent rester verts sans modification (règle en sur-ensemble, D6)
 
 **Checkpoint**: un run standard sur Exemple_3 produit un `nettoye.md` sans destination ; la suite est au vert.
 
@@ -61,7 +61,7 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md, sectio
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Vérifier que T003 passe avec la règle unifiée de T006 (garde-fou par construction, D5, FR-007) — aucune modification de code attendue ; si le test échoue, corriger la règle (T006), jamais le test
+- [x] T008 [US2] Vérifier que T003 passe avec la règle unifiée de T006 (garde-fou par construction, D5, FR-007) — aucune modification de code attendue ; si le test échoue, corriger la règle (T006), jamais le test
 
 **Checkpoint**: le garde-fou est verrouillé par test ; US1 reste fonctionnel.
 
@@ -75,8 +75,8 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md, sectio
 
 ### Implementation for User Story 3
 
-- [ ] T009 [US3] Étendre la regex de `nettoyer_destinations` dans `md_cleaner/nettoyage.py` : `(?<=\])\(<[^>]*>\)` → `(?<=\])\(<[^>]*>(?: "[^"]*")?\)` — le titre éventuel (espace + guillemets compris) est emporté avec la destination, échappements tels quels (D2, FR-002, FR-006) ; docstring mise à jour
-- [ ] T010 [US3] Vérifier que T002 passe et que la suite complète reste au vert : `pytest` (SC-006, SC-007)
+- [x] T009 [US3] Étendre la regex de `nettoyer_destinations` dans `md_cleaner/nettoyage.py` : `(?<=\])\(<[^>]*>\)` → `(?<=\])\(<[^>]*>(?: "[^"]*")?\)` — le titre éventuel (espace + guillemets compris) est emporté avec la destination, échappements tels quels (D2, FR-002, FR-006) ; docstring mise à jour
+- [x] T010 [US3] Vérifier que T002 passe et que la suite complète reste au vert : `pytest` (SC-006, SC-007)
 
 **Checkpoint**: seuls les libellés survivent sur toutes les formes chevrons, avec ou sans titre.
 
@@ -90,7 +90,7 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md, sectio
 
 ### Implementation for User Story 4
 
-- [ ] T011 [US4] Vérifier que T005 passe (SC-003, SC-004, FR-003, FR-005) — aucune modification CLI attendue : `--conserver-liens` se propage déjà aux deux writers ; si un test échoue, investiguer la propagation dans `md_cleaner/nettoyage.py` sans toucher au contrat CLI (codes retour inchangés)
+- [x] T011 [US4] Vérifier que T005 passe (SC-003, SC-004, FR-003, FR-005) — aucune modification CLI attendue : `--conserver-liens` se propage déjà aux deux writers ; si un test échoue, investiguer la propagation dans `md_cleaner/nettoyage.py` sans toucher au contrat CLI (codes retour inchangés)
 
 **Checkpoint**: les quatre stories sont indépendamment fonctionnelles ; la sortie paginée reste cohérente avec sa cartographie.
 
@@ -100,11 +100,11 @@ Projet existant : paquet `md_cleaner/` et `tests/` à la racine (plan.md, sectio
 
 **Purpose**: documentation exacte, contrats et validation de bout en bout.
 
-- [ ] T012 [P] Mettre à jour l'aide de `--conserver-liens` dans `construire_analyseur` de `md_cleaner/cli.py` : « conserve les destinations de liens inline `](<...>)` » (au lieu de `](</...>)`) — exactitude de l'aide, aucun changement de comportement ni de contrat (D4)
-- [ ] T013 [P] Mettre à jour `README.md` : description de l'option `--conserver-liens` (destinations entre chevrons, tout schéma) et exemple sur Exemple_3
-- [ ] T014 [P] Mettre à jour la table des options dans `specs/001-nettoyage-md-repetitif/contracts/cli.md` : description de `--conserver-liens` révisée par `specs/005-nettoyage-liens-absolus/contracts/nettoyage-liens-absolus.md`
-- [ ] T015 Exécuter les scénarios 1 à 7 de `specs/005-nettoyage-liens-absolus/quickstart.md` sur `Examples/Exemple_1`, `Exemple_2`, `Exemple_3` et le document garde-fou construit, et constater les attendus
-- [ ] T016 Vérification finale : `pytest` au vert et `pre-commit run --all-files` sans échec (SC-007)
+- [x] T012 [P] Mettre à jour l'aide de `--conserver-liens` dans `construire_analyseur` de `md_cleaner/cli.py` : « conserve les destinations de liens inline `](<...>)` » (au lieu de `](</...>)`) — exactitude de l'aide, aucun changement de comportement ni de contrat (D4)
+- [x] T013 [P] Mettre à jour `README.md` : description de l'option `--conserver-liens` (destinations entre chevrons, tout schéma) et exemple sur Exemple_3
+- [x] T014 [P] Mettre à jour la table des options dans `specs/001-nettoyage-md-repetitif/contracts/cli.md` : description de `--conserver-liens` révisée par `specs/005-nettoyage-liens-absolus/contracts/nettoyage-liens-absolus.md`
+- [x] T015 Exécuter les scénarios 1 à 7 de `specs/005-nettoyage-liens-absolus/quickstart.md` sur `Examples/Exemple_1`, `Exemple_2`, `Exemple_3` et le document garde-fou construit, et constater les attendus
+- [x] T016 Vérification finale : `pytest` au vert et `pre-commit run --all-files` sans échec (SC-007)
 
 ---
 
