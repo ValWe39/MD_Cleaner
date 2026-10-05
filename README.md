@@ -118,16 +118,21 @@ md-cleaner dossierA          # seuls les .md du premier niveau, triés par nom
 md-cleaner doc1.md dossierA   # doc1, puis les .md du dossier
 ```
 
-Chaque document est traité comme une invocation individuelle (un
-dossier de run par document, les mêmes paramètres de cleaning pour
-tous), dans l'ordre des arguments. Les doublons sont traités à chaque
-occurrence (sorties suffixées `-1`, `-2`, jamais d'écrasement).
+Chaque document est traité avec les mêmes paramètres de cleaning, dans
+l'ordre des arguments, et **toutes les sorties de l'invocation vont dans
+un seul et même dossier de run numéroté** (`output\00X`). Les doublons
+sont traités à chaque occurrence (sorties suffixées `-1`, `-2`, jamais
+d'écrasement).
 
 Points d'attention :
 
-- `--dry-run` et `--suggestion` ne s'appliquent qu'à un lot d'un seul
-  document ; en lot de plusieurs, elles sont neutralisées avec un
-  avertissement explicite et le lot est nettoyé.
+- En lot de plusieurs avec `--pagine`, les sorties secondaires sont
+  préfixées par le nom du document : `doc-nettoye-pagine.md`,
+  `doc-cartographie.json` (noms courts inchangés pour un seul document).
+- `--dry-run`, `--suggestion` et `--nom-titre` ne s'appliquent qu'à un
+  lot d'un seul document ; en lot de plusieurs, elles sont neutralisées
+  avec un avertissement explicite et le lot est nettoyé (dossier
+  numéroté pour `--nom-titre`).
 - Un document en échec est signalé (`ERREUR : ...` sur stderr) et le
   lot poursuit ; au troisième échec consécutif, le lot s'arrête net.
 - Code retour : 0 si tous les documents ont réussi, 1 sinon.
@@ -135,7 +140,8 @@ Points d'attention :
   document n'est retenu, l'invocation échoue (code 1).
 
 Règles complètes :
-`specs/007-traitement-multi-documents/contracts/multi-entrees.md`.
+`specs/007-traitement-multi-documents/contracts/multi-entrees.md` et
+`specs/008-dossier-sorties-lot/contracts/dossier-de-lot.md`.
 
 ## Notes de version
 

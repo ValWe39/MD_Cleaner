@@ -2,7 +2,7 @@
 
 **Feature**: 001-nettoyage-md-repetitif | **Date**: 2026-09-29 | **Source**: [spec.md](./spec.md), [research.md](./research.md)
 
-L'outil expose un point d'entrée unique en ligne de commande. Un run = un fichier d'entrée (FR-001), révisé par la feature 007 : une invocation accepte une ou plusieurs entrées, chaque document produisant son propre run. Tout traitement est local et hors-ligne.
+L'outil expose un point d'entrée unique en ligne de commande. Un run = un fichier d'entrée (FR-001), révisé par la feature 007 : une invocation accepte une ou plusieurs entrées ; depuis la feature 008, une invocation produit un seul dossier de run partagé (`specs/008-dossier-sorties-lot/contracts/dossier-de-lot.md`). Tout traitement est local et hors-ligne.
 
 ## Point d'entrée
 
@@ -25,7 +25,7 @@ Une entrée est un fichier `.md` ou un dossier (seuls les `.md` de premier nivea
 | `--echantillon` | dossier | auto-calibrage | FR-012 | Calibrage sur un échantillon fourni (≤ 5 fichiers `.md`, triés par nom) |
 | `--calibrage` | entier 2–50 | 5 | FR-013 | Nombre N de premières pages utilisées par l'auto-calibrage |
 | `--sortie` | dossier | `./output` | FR-006 | Dossier racine des sorties |
-| `--nom-titre` | entier 5–100 | numérotation | FR-006 | Nomme le sous-dossier du run d'après les X premiers caractères du slug du titre |
+| `--nom-titre` | entier 5–100 | numérotation | FR-006 ; 008 : FR-005 | Nomme le sous-dossier du run d'après les X premiers caractères du slug du titre (mono-document) ; neutralisée avec avertissement en lot de plusieurs |
 
 ## Comportements par défaut (suggestion par défaut = saut du dry-run)
 

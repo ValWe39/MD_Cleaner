@@ -20,7 +20,7 @@
 
 **Purpose**: point de départ vérifié avant toute modification
 
-- [ ] T001 Exécuter `pytest` à la racine du dépôt et consigner la baseline verte intégrale (165 tests attendus) ; si un test existe déjà en échec, stopper et corriger avant tout changement
+- [x] T001 Exécuter `pytest` à la racine du dépôt et consigner la baseline verte intégrale (165 tests attendus) ; si un test existe déjà en échec, stopper et corriger avant tout changement
 
 ---
 
@@ -28,8 +28,8 @@
 
 **Purpose**: mécanisme anti-collision généralisé, préalable à US1 et US2
 
-- [ ] T002 Implémenter `resoudre_chemin_libre(dossier, base, extension)` dans `md_cleaner/sortie.py` (D4) : premier chemin libre pour `<base><suffixe><extension>` avec suffixe `-1`, `-2`, ... inséré avant l'extension, jamais d'écrasement ; refactorer `resoudre_chemin_nettoye` en appel mince à cette fonction (comportement inchangé, tests 006 à l'appui)
-- [ ] T003 [P] Écrire les tests unitaires dans `tests/unit/test_sortie.py` (échouant d'abord pour la nouvelle fonction) : nominal libre, collision `-1`/`-2`, extension `.json`, jamais d'écrasement d'un fichier existant, et non-régression de `resoudre_chemin_nettoye`
+- [x] T002 Implémenter `resoudre_chemin_libre(dossier, base, extension)` dans `md_cleaner/sortie.py` (D4) : premier chemin libre pour `<base><suffixe><extension>` avec suffixe `-1`, `-2`, ... inséré avant l'extension, jamais d'écrasement ; refactorer `resoudre_chemin_nettoye` en appel mince à cette fonction (comportement inchangé, tests 006 à l'appui)
+- [x] T003 [P] Écrire les tests unitaires dans `tests/unit/test_sortie.py` (échouant d'abord pour la nouvelle fonction) : nominal libre, collision `-1`/`-2`, extension `.json`, jamais d'écrasement d'un fichier existant, et non-régression de `resoudre_chemin_nettoye`
 
 **Checkpoint**: Foundation ready — les user stories peuvent commencer
 
@@ -43,11 +43,11 @@
 
 ### Tests for User Story 1
 
-- [ ] T004 [P] [US1] Migrer et étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : lot de 3 documents → exactement 1 dossier de run contenant `consolidated-nettoye.md`, `consolidated-nettoye-1.md`, `retry-failed-records-nettoye.md` (SC-001, SC-002) ; deux invocations successives → `001` puis `002` (SC-005) ; mono-document strictement inchangé (SC-003) ; remplacer les ~9 assertions existantes qui codent un dossier par document
+- [x] T004 [P] [US1] Migrer et étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : lot de 3 documents → exactement 1 dossier de run contenant `consolidated-nettoye.md`, `consolidated-nettoye-1.md`, `retry-failed-records-nettoye.md` (SC-001, SC-002) ; deux invocations successives → `001` puis `002` (SC-005) ; mono-document strictement inchangé (SC-003) ; remplacer les ~9 assertions existantes qui codent un dossier par document
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Câbler dans `md_cleaner/cli.py` (D1, D2) : créer le dossier de run **une fois** dans `main()` après résolution du lot, neutralisations et validation de l'échantillon, uniquement si le lot compte plusieurs documents (`creer_dossier_run(args.sortie, "", None)`) ; passer le dossier à `_traiter_document` via un paramètre `dossier: Path | None` (`None` → création interne inchangée pour le lot d'un document)
+- [x] T005 [US1] Câbler dans `md_cleaner/cli.py` (D1, D2) : créer le dossier de run **une fois** dans `main()` après résolution du lot, neutralisations et validation de l'échantillon, uniquement si le lot compte plusieurs documents (`creer_dossier_run(args.sortie, "", None)`) ; passer le dossier à `_traiter_document` via un paramètre `dossier: Path | None` (`None` → création interne inchangée pour le lot d'un document)
 
 **Checkpoint**: US1 fonctionnelle et testable seule — MVP livrable
 
@@ -61,11 +61,11 @@
 
 ### Tests for User Story 2
 
-- [ ] T006 [P] [US2] Étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : lot de 2 avec `--pagine` → `<stem1>-nettoye-pagine.md`, `<stem1>-cartographie.json`, `<stem2>-nettoye-pagine.md`, `<stem2>-cartographie.json` (FR-003, SC-004) ; deux stems identiques → paires suffixées alignées (`consolidated-nettoye-1.md`, `consolidated-nettoye-pagine-1.md`, `consolidated-cartographie-1.json`) ; lot d'un document (fichier ou dossier à 1 `.md`) → noms courts actuels
+- [x] T006 [P] [US2] Étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : lot de 2 avec `--pagine` → `<stem1>-nettoye-pagine.md`, `<stem1>-cartographie.json`, `<stem2>-nettoye-pagine.md`, `<stem2>-cartographie.json` (FR-003, SC-004) ; deux stems identiques → paires suffixées alignées (`consolidated-nettoye-1.md`, `consolidated-nettoye-pagine-1.md`, `consolidated-cartographie-1.json`) ; lot d'un document (fichier ou dossier à 1 `.md`) → noms courts actuels
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Implémenter le préfixage conditionnel dans `md_cleaner/cli.py` (D3) : en lot de plusieurs, chemins paginés et cartographie résolus via `resoudre_chemin_libre` avec les bases `<nom-dérivé>-nettoye-pagine` (extension `.md`) et `<nom-dérivé>-cartographie` (extension `.json`) ; en lot d'un document, chemins fixes actuels (`nettoye-pagine.md`, `cartographie.json`) inchangés
+- [x] T007 [US2] Implémenter le préfixage conditionnel dans `md_cleaner/cli.py` (D3) : en lot de plusieurs, chemins paginés et cartographie résolus via `resoudre_chemin_libre` avec les bases `<nom-dérivé>-nettoye-pagine` (extension `.md`) et `<nom-dérivé>-cartographie` (extension `.json`) ; en lot d'un document, chemins fixes actuels (`nettoye-pagine.md`, `cartographie.json`) inchangés
 
 **Checkpoint**: US1 et US2 fonctionnelles et testables indépendamment
 
@@ -79,8 +79,8 @@
 
 ### Tests for User Story 3
 
-- [ ] T008 [P] [US3] Étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : échec isolé → sorties valides dans l'unique dossier, `ERREUR : ...` signalée, code 1, aucun marqueur (FR-006) ; lot entièrement en échec (2 absents) → dossier de run numéroté **vide** en place, code 1 (FR-007) ; lot vide (dossier sans `.md` seul) → aucun dossier créé, code 1 (FR-008) ; lot interrompu par fail-fast → sorties déjà produites conservées dans l'unique dossier
-- [ ] T009 [US3] Vérifier et ajuster l'ordre de création dans `md_cleaner/cli.py` si besoin (D1) : le dossier est créé après la résolution du lot et les neutralisations (jamais pour un lot vide) et avant la boucle de traitement (présent dès un échec total) — l'essentiel découle de T005, ce borne le contrat
+- [x] T008 [P] [US3] Étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : échec isolé → sorties valides dans l'unique dossier, `ERREUR : ...` signalée, code 1, aucun marqueur (FR-006) ; lot entièrement en échec (2 absents) → dossier de run numéroté **vide** en place, code 1 (FR-007) ; lot vide (dossier sans `.md` seul) → aucun dossier créé, code 1 (FR-008) ; lot interrompu par fail-fast → sorties déjà produites conservées dans l'unique dossier
+- [x] T009 [US3] Vérifier et ajuster l'ordre de création dans `md_cleaner/cli.py` si besoin (D1) : le dossier est créé après la résolution du lot et les neutralisations (jamais pour un lot vide) et avant la boucle de traitement (présent dès un échec total) — l'essentiel découle de T005, ce borne le contrat
 
 **Checkpoint**: US1, US2 et US3 fonctionnelles indépendamment
 
@@ -94,8 +94,8 @@
 
 ### Tests for User Story 4
 
-- [ ] T010 [P] [US4] Étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : lot de 2 avec `--nom-titre 30` → avertissement `AVERTISSEMENT : --nom-titre ignorée en lot : applicable à un seul document` sur stderr, dossier numéroté, code 0 (FR-005) ; mono-document avec `--nom-titre 30` → dossier nommé d'après le titre, sans avertissement (rétrocompatibilité)
-- [ ] T011 [US4] Implémenter la neutralisation dans `md_cleaner/cli.py` (D5) : dans le bloc de neutralisation de `main()`, à côté de `--dry-run`/`--suggestion`, avertissement sur stderr puis `args.nom_titre = None` si le lot compte plusieurs documents
+- [x] T010 [P] [US4] Étendre les tests d'intégration dans `tests/integration/test_lot.py` (échouant d'abord) : lot de 2 avec `--nom-titre 30` → avertissement `AVERTISSEMENT : --nom-titre ignorée en lot : applicable à un seul document` sur stderr, dossier numéroté, code 0 (FR-005) ; mono-document avec `--nom-titre 30` → dossier nommé d'après le titre, sans avertissement (rétrocompatibilité)
+- [x] T011 [US4] Implémenter la neutralisation dans `md_cleaner/cli.py` (D5) : dans le bloc de neutralisation de `main()`, à côté de `--dry-run`/`--suggestion`, avertissement sur stderr puis `args.nom_titre = None` si le lot compte plusieurs documents
 
 **Checkpoint**: les quatre stories sont fonctionnelles — reste la documentation et la validation croisée
 
@@ -105,9 +105,9 @@
 
 **Purpose**: contrats, documentation et validation transverses
 
-- [ ] T012 [P] Réviser `specs/007-traitement-multi-documents/contracts/multi-entrees.md` selon D7 : FR-003 et FR-011 passent de « un dossier de run par document » à « un dossier de run par invocation », avec renvoi vers `specs/008-dossier-sorties-lot/contracts/dossier-de-lot.md` pour la règle complète
-- [ ] T013 [P] Réviser `specs/001-nettoyage-md-repetitif/contracts/cli.md` (table des fichiers produits par mode, exemples) et la section « Traiter plusieurs documents » du `README.md` (dossier unique, secondaires préfixées, `--nom-titre` neutralisée)
-- [ ] T014 Exécuter la validation complète : `pytest` (suite entière au vert, sans relâchement), `pre-commit run --all-files`, et les 8 scénarios de `specs/008-dossier-sorties-lot/quickstart.md`
+- [x] T012 [P] Réviser `specs/007-traitement-multi-documents/contracts/multi-entrees.md` selon D7 : FR-003 et FR-011 passent de « un dossier de run par document » à « un dossier de run par invocation », avec renvoi vers `specs/008-dossier-sorties-lot/contracts/dossier-de-lot.md` pour la règle complète
+- [x] T013 [P] Réviser `specs/001-nettoyage-md-repetitif/contracts/cli.md` (table des fichiers produits par mode, exemples) et la section « Traiter plusieurs documents » du `README.md` (dossier unique, secondaires préfixées, `--nom-titre` neutralisée)
+- [x] T014 Exécuter la validation complète : `pytest` (suite entière au vert, sans relâchement), `pre-commit run --all-files`, et les 8 scénarios de `specs/008-dossier-sorties-lot/quickstart.md`
 
 ---
 

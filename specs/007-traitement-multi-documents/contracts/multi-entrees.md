@@ -30,7 +30,7 @@ L'invocation sans argument reste un usage invalide (code 3).
 ## Options en lot
 
 - Les paramètres de cleaning (`--pagine`, `--conserver-liens`, `--seuil`, `--calibrage`, `--extrait`, `--nom-titre`, `--sortie`, `--echantillon`) s'appliquent à l'identique à chaque document du lot.
-- `--nom-titre` s'applique par document : chaque document nomme son propre dossier de run d'après son propre titre.
+- `--nom-titre` : en mono-document, nomme le dossier de run d'après le titre du document ; en lot de plusieurs, elle est neutralisée avec avertissement (008, FR-005 — voir `specs/008-dossier-sorties-lot/contracts/dossier-de-lot.md`).
 - `--dry-run` et `--suggestion` ne sont applicables qu'à un lot d'exactement un document :
   - lot de plusieurs documents → chacune produit un avertissement explicite sur stderr (`AVERTISSEMENT : --dry-run ignorée en lot : applicable à un seul document`, et l'équivalent pour `--suggestion`), est neutralisée, et le lot est traité en nettoyage complet — aucun artefact de dry-run, aucune suggestion consommée ;
   - lot d'un seul document (y compris issu d'un dossier) → comportement actuel inchangé.
@@ -54,7 +54,7 @@ L'invocation sans argument reste un usage invalide (code 3).
 ## Exemples
 
 ```text
-md-cleaner a.md b.md c.md          # 3 runs, un par document, mêmes paramètres
+md-cleaner a.md b.md c.md          # 1 dossier de run partagé (008), mêmes paramètres
 md-cleaner dossierA                # tous les .md de premier niveau, triés par nom
 md-cleaner a.md dossierA           # a.md puis les .md du dossier
 md-cleaner a.md absent.md b.md      # a.md et b.md traités, absent.md signalé, code 1
