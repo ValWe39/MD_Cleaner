@@ -18,6 +18,11 @@
 - Q: Comportement par défaut ou option ? → A: Le nouveau nommage remplace le comportement par défaut ; aucune option de repli vers `nettoye.md` (handoff du decide, confirmé).
 - Q: Quand la règle de collision `-1` s'applique-t-elle, sachant que chaque run a son propre sous-dossier ? → A: Scénario rare avec la structure actuelle, mais la règle reste spécifiée comme garantie : si le nom de sortie cible existe déjà à l'emplacement d'écriture, un suffixe numérique est ajouté, jamais d'écrasement silencieux. Premier conflit → `-1`, suivant → `-2`, par ordre de traitement.
 
+### Session 2026-10-05 (clarification)
+
+- Q: En cas de conflit de nom, où le numéro doit-il être inséré exactement ? → A: À la fin du nom de sortie, juste avant l'extension `.md` : `<nom>-nettoye-1.md` ; le suffixe `-nettoye` reste invariable.
+- Q: Pour un nom d'entrée plus long que 20 caractères, comment tronquer la base du nom de sortie ? → A: Troncature brute aux 20 premiers caractères, sans respect de frontière de mot (arbitrage du stade specify confirmé).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Sortie reconnaissable par son nom (Priority: P1)
@@ -82,13 +87,13 @@ Un utilisateur traite successivement deux documents dont les noms produisent le 
 - **FR-001**: L'outil DOIT nommer le fichier nettoyé d'un run d'après le nom de son document d'entrée : les 20 premiers caractères du nom de fichier sans extension, suivis du suffixe `-nettoye` et de l'extension `.md`.
 - **FR-002**: L'outil DOIT remplacer chaque caractère blanc (espace, tabulation) du nom dérivé par `_` ; tout autre caractère (accents, tirets, chiffres, ponctuation) DOIT être conservé tel quel.
 - **FR-003**: Lorsque le nom d'entrée dépasse 20 caractères, l'outil DOIT tronquer le nom dérivé aux 20 premiers caractères, sans ajustement à la frontière de mot ; en deçà, aucun remplissage ni troncature.
-- **FR-004**: Si le nom de sortie cible existe déjà à l'emplacement d'écriture, l'outil DOIT ajouter un suffixe numérique au nom dérivé avant `-nettoye.md` : `-1` au premier conflit, puis `-2`, `-3`, ... par ordre de traitement ; l'outil NE DOIT JAMAIS écraser un fichier existant.
+- **FR-004**: Si le nom de sortie cible existe déjà à l'emplacement d'écriture, l'outil DOIT ajouter un suffixe numérique à la fin du nom, juste avant l'extension `.md` : `-1` au premier conflit, puis `-2`, `-3`, ... par ordre de traitement (ex. `<nom>-nettoye-1.md`) ; l'outil NE DOIT JAMAIS écraser un fichier existant.
 - **FR-005**: Les autres artefacts du run (`nettoye-pagine.md`, `cartographie.json`, `suggestion.json`, `rapport-dry-run.md`) et le nommage des dossiers de run (numérotation séquentielle, `--nom-titre`) DOIVENT rester inchangés.
 - **FR-006**: Le message de fin de commande DOIT afficher le chemin réel du fichier nettoyé tel que nommé.
 
 ### Key Entities
 
-- **Nom de sortie dérivé** : chaîne construite depuis le nom du document d'entrée — base = 20 premiers caractères du nom sans extension, blancs remplacés par `_` ; suffixe invariable `-nettoye` ; extension `.md` ; variantes de collision numérotées (`-1`, `-2`, ...) insérées avant le suffixe. Attributs : déterministe depuis le nom d'entrée, prévisible par l'utilisateur, unique à l'emplacement d'écriture.
+- **Nom de sortie dérivé** : chaîne construite depuis le nom du document d'entrée — base = 20 premiers caractères du nom sans extension, blancs remplacés par `_` ; suffixe invariable `-nettoye` ; extension `.md` ; variantes de collision numérotées (`-1`, `-2`, ...) ajoutées à la fin du nom, avant l'extension. Attributs : déterministe depuis le nom d'entrée, prévisible par l'utilisateur, unique à l'emplacement d'écriture.
 
 ## Success Criteria *(mandatory)*
 
