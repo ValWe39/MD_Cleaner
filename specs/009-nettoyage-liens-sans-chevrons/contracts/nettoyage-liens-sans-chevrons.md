@@ -15,8 +15,11 @@ conservée, après la passe chevrons 004/005 inchangée :
 cible   : la sous-chaîne (...) qui suit le crochet fermant ] du
           libellé, destination ne commençant pas par <, avec son
           titre éventuel
-          ( ](dest) = ] + ( + destination sans espace ni < + ) )
-          ( ](dest "titre") = forme précédente + espace + titre )
+          ( ](dest) = ] + ( + destination sans < initial + ) ) ;
+          destination avec espaces couverte tant qu'aucun titre
+          ne suit (bug nettoyage-balises2, Markdown invalide)
+          ( ](dest "titre") = destination + espace + titre ;
+            guillemets internes échappés du titre couverts )
 retrait : la sous-chaîne complète, parenthèses, espace et guillemets
           du titre compris
 restes  : le libellé [texte] avec ses crochets, et le reste de la
@@ -43,6 +46,12 @@ sortie : [Revenir en haut de page]
 
 entrée : [Ressources](#)
 sortie : [Ressources]
+
+entrée : [1](#easy-footnote-bottom-1 "… <a href=\"https://...\">…</a> …")
+sortie : [1]
+
+entrée : [Histoire en images](https://.../Histoire en images)
+sortie : [Histoire en images]
 ```
 
 ## Garde-fous (FR-003, FR-005, FR-006)
@@ -51,6 +60,7 @@ sortie : [Ressources]
 | ----- | ---------- |
 | `![](/images/FIV11a.png)` (image) | inchangée octet par octet |
 | `[![FIPECO](/images/logo.jpg)](/)` | devient `[![FIPECO](/images/logo.jpg)]` |
+| `<https://...>` (autolink, quick fix 2026-10-27) | retiré, sauf `](<https://...>` (limite chevron préservée) |
 | `](<...>)` (chevrons — 004/005) | inchangé : règle 004/005 seule |
 | URL nue hors syntaxe de lien | intacte (aucun crochet fermant) |
 | Bloc de code | intact (aucun crochet fermant suivi de `(`) |
@@ -77,7 +87,12 @@ passe détection de motifs, hors périmètre.
 
 - Alt d'image contenant un crochet fermant : non couvert par la
   protection ; aucune occurrence dans les corpus connus.
-- Titre avec guillemet interne échappé : arrête le match avant la
-  parenthèse fermante — destination laissée en place, sans corruption
-  (limite héritée de 005) ; 0 occurrence dans le corpus de calibration.
+- Titre à guillemets internes échappés : emporté avec la destination
+  depuis le fix du bug nettoyage-balises2 (footnotes à HTML embarqué,
+  corpus Le Grand Continent) ; la limite subsiste pour la règle
+  chevron 004/005 (FR-005, arbitrage : chevron inchangé).
+- Destination avec espaces : emportée tant qu'aucun titre ne suit
+  (Markdown invalide du convertisseur) ; une destination à espaces
+  suivie d'un titre (`](a b "t")`) reste non couverte, ligne
+  inchangée sans corruption.
 - Idempotence (FR-008) : un second passage ne modifie pas la sortie.
