@@ -34,9 +34,10 @@ Attendu :
   court » — les lignes sont toutes conservées, seule la passe de liens
   s'applique ;
 - aucun `](/`, `](#`, `](https://`, `](http://`, `](Les-` ne subsiste
-  dans la sortie (baseline : 43 occurrences pour ce fichier) ;
-- les libellés sont présents et inchangés : `[Lire →]`,
-  `*crédit d'impôt*`, `[Revenir en haut de page]` ;
+  dans la sortie (baseline à la règle 009 : 46 destinations de liens
+  pour ce fichier, 9 images épargnées dans le corpus) ;
+- les libellés sont présents et inchangés, crochets compris : `[Lire →]`,
+  `[*crédit d'impôt*]`, `[Revenir en haut de page]` ;
 - les images sont intactes : `![](/images/FIV11a.png)` inchangé,
   logo réduit à `[![FIPECO](/images/logo_legacy.jpg)]`.
 
@@ -63,7 +64,7 @@ archivée).
 ## Scénario 3 — Neutralité sur les corpus historiques (SC-003, FR-005)
 
 ```bash
-md-cleaner Examples/Exemple_3
+md-cleaner Examples/Exemple_3/2.Input/retry-failed-records.md
 ```
 
 Attendu : sorties identiques octet par octet aux sorties de référence

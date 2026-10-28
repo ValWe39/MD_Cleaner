@@ -89,7 +89,10 @@ def construire_analyseur() -> _Analyseur:
     analyseur.add_argument(
         "--conserver-liens",
         action="store_true",
-        help="conserve les destinations de liens inline ](<...>) dans les sorties .md",
+        help=(
+            "conserve les destinations de liens inline ](<...>) et ](...) "
+            "dans les sorties .md"
+        ),
     )
     analyseur.add_argument(
         "--seuil",

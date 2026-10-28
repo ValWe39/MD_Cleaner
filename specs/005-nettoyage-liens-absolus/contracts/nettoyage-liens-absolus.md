@@ -40,7 +40,7 @@ Bornes de la règle :
 | `](<url> "titre")` (avec titre) | destination **et** titre retirés ; seuls les libellés survivent |
 | `[](</...>)` (libellé vide) | destination retirée, crochets vides conservés |
 | plusieurs occurrences sur une même ligne | toutes retirées |
-| `](https://...)` sans chevrons, `](chemin)` nu | hors périmètre : inchangées (clarification 2026-10-05) |
+| `](https://...)` sans chevrons, `](chemin)` nu | retirées par la règle 009 |
 | URL nue dans le corps du texte ou dans un bloc de code | hors périmètre : intacte octet par octet (garde-fou, FR-007) |
 | vraies balises HTML (`<div>`, `<!-- page: N -->`) | hors périmètre : inchangées |
 | titre contenant un guillemet interne échappé (`\"`) | non matché : destination laissée en place, sans corruption (limite documentée, D2) |

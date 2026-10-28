@@ -30,7 +30,7 @@ entrée : [Lire →](/commentaire/Le%20patrimoine%20des%20...)
 sortie : [Lire →]
 
 entrée : [*crédit d'impôt*](Les-crédits-dimp...)
-sortie : *crédit d'impôt*
+sortie : [*crédit d'impôt*]
 
 entrée : [une note](https://www.imf.org/en/Publications/...)
 sortie : une note

@@ -30,7 +30,7 @@ racine du dépôt (structure existante, inchangée — plan.md).
 
 **Purpose**: vérifier l'environnement de départ avant toute modification.
 
-- [ ] T001 Vérifier la présence locale du corpus de calibration
+- [x] T001 Vérifier la présence locale du corpus de calibration
   `Examples/Nettoyage-balises/` (5 fichiers
   `fipeco.fr-00003{3..7}-nettoye.md`, gitignoré) et la baseline :
   `pytest tests/unit/test_nettoyage_liens.py
@@ -43,12 +43,12 @@ racine du dépôt (structure existante, inchangée — plan.md).
 **Purpose**: briques textuelles partagées par toutes les stories ;
 aucun comportement changé à ce stade (`nettoyer_destinations` intacte).
 
-- [ ] T002 [P] Ajouter dans `md_cleaner/nettoyage.py` la constante
+- [x] T002 [P] Ajouter dans `md_cleaner/nettoyage.py` la constante
   `RE_IMAGE_INLINE` (construct `![alt](destination)`, alt sans crochet
   fermant — limite D2 de research.md) et les fonctions de
   protection/restauration par sentinelles éphémères sans `](` ni `](<`
   (D2, D4) ; les sentinelles sont invisibles pour les deux passes
-- [ ] T003 [P] Ajouter dans `md_cleaner/nettoyage.py` la constante
+- [x] T003 [P] Ajouter dans `md_cleaner/nettoyage.py` la constante
   `RE_DESTINATION_SANS_CHEVRONS` : sous-chaîne `(...)` suivant un
   crochet fermant, destination sans espaces ne commençant pas par `<`
   (exclusion `(?!<)`, D3), destination vide `(#)` couverte, titre
@@ -74,24 +74,24 @@ destination de lien sans chevrons ; libellés et texte inchangés.
 > **NOTE**: écrire ces tests AVANT l'implémentation, les faire ÉCHOUER
 > d'abord.
 
-- [ ] T004 [P] [US1] Étendre `tests/unit/test_nettoyage_liens.py` :
+- [x] T004 [P] [US1] Étendre `tests/unit/test_nettoyage_liens.py` :
   ancre `(#main-content)` et `(#)`, relatif-racine `(/fiches)`, relatif
   sans slash `(Les-crédits-dimp...)`, absolu `(https://...)`, titre
   `](url "titre")` sans chevrons, plusieurs liens par ligne, note de
   bas de page `[[1]](#_ftn1)`, ligne entièrement-lien conservée
   (FR-001, FR-002, FR-007)
-- [ ] T005 [P] [US1] Étendre `tests/integration/test_nettoyage_liens.py` :
+- [x] T005 [P] [US1] Étendre `tests/integration/test_nettoyage_liens.py` :
   run sur les 5 fichiers de `Examples/Nettoyage-balises/` (skip si le
   dossier est absent — corpus gitignoré), 0 destination sans chevrons
   dans les sorties, libellés et ordre des lignes inchangés (SC-001)
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Intégrer dans `md_cleaner/nettoyage.py`
+- [x] T006 [US1] Intégrer dans `md_cleaner/nettoyage.py`
   `nettoyer_destinations` l'ordre D4 : protection images → passe
   chevrons inchangée → passe sans chevrons → restauration ; mettre à
   jour la docstring (règles D1, D3, D4) ; dépend de T002, T003
-- [ ] T007 [US1] Faire passer T004 et T005 au vert ; vérifier
+- [x] T007 [US1] Faire passer T004 et T005 au vert ; vérifier
   l'idempotence de la passe sur un document à double passage (FR-008)
 
 **Checkpoint**: US1 fonctionnelle et testable indépendamment — MVP
@@ -110,18 +110,18 @@ sur le corpus de calibration à la sortie produite sans la feature
 
 ### Tests for User Story 2
 
-- [ ] T008 [P] [US2] Étendre `tests/unit/test_nettoyage_liens.py` :
+- [x] T008 [P] [US2] Étendre `tests/unit/test_nettoyage_liens.py` :
   `conserver_liens=True` laisse intactes les formes sans chevrons
   (ancres, relatifs, absolus) — les deux règles sont désactivées
   ensemble (FR-004)
-- [ ] T009 [P] [US2] Étendre `tests/integration/test_nettoyage_liens.py` :
+- [x] T009 [P] [US2] Étendre `tests/integration/test_nettoyage_liens.py` :
   run `--conserver-liens` sur un fichier du corpus
   `Examples/Nettoyage-balises/`, sortie octet par octet identique à la
   sortie produite sans la feature (FR-004)
 
 ### Implementation for User Story 2
 
-- [ ] T010 [US2] Vérifier la propagation du drapeau existant dans
+- [x] T010 [US2] Vérifier la propagation du drapeau existant dans
   `md_cleaner/cli.py` → `ecrire_nettoye`/`ecrire_nettoye_pagine` : aucun
   changement de code attendu (contrat D5), sinon corriger ; faire
   passer T008 et T009 au vert
@@ -141,7 +141,7 @@ FR-006, quickstart.md scénarios 1 et 4).
 
 ### Tests for User Story 3
 
-- [ ] T011 [P] [US3] Étendre `tests/unit/test_nettoyage_liens.py` :
+- [x] T011 [P] [US3] Étendre `tests/unit/test_nettoyage_liens.py` :
   image simple `![](/images/FIV11a.png)` inchangée octet par octet ;
   logo imbriqué `[![FIPECO](/images/logo.jpg)](/)` devient
   `[![FIPECO](/images/logo.jpg)]` (FR-003, D7) ; alt contenant un
@@ -150,7 +150,7 @@ FR-006, quickstart.md scénarios 1 et 4).
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Faire passer T011 au vert en s'appuyant sur la
+- [x] T012 [US3] Faire passer T011 au vert en s'appuyant sur la
   protection T002 (aucune règle supplémentaire attendue — si un cas
   échoue, corriger la protection ou documenter l'écart dans
   `specs/009-nettoyage-liens-sans-chevrons/research.md`
@@ -170,20 +170,20 @@ quickstart.md scénario 3).
 
 ### Tests for User Story 4
 
-- [ ] T013 [P] [US4] Étendre `tests/integration/test_nettoyage_liens.py` :
+- [x] T013 [P] [US4] Étendre `tests/integration/test_nettoyage_liens.py` :
   neutralité octet par octet sur `Examples/Exemple_1/2.Input/consolidated.md`,
   `Examples/Exemple_2/2.Input/consolidated.md` et
   `Examples/Exemple_3/2.Input/retry-failed-records.md` (0 forme sans
   chevrons dans ces corpus — SC-003), et corpus sans aucune forme de
   destination inchangé
-- [ ] T014 [P] [US4] Étendre `tests/unit/test_nettoyage_liens.py` :
+- [x] T014 [P] [US4] Étendre `tests/unit/test_nettoyage_liens.py` :
   formes chevrons `](<...>)` et `](<...> "titre")` traitées à
   l'identique de 004/005 (mêmes sorties que les tests existants,
   FR-005) ; marqueurs `<!-- page: N -->` et pagination intacts
 
 ### Implementation for User Story 4
 
-- [ ] T015 [US4] Faire passer T013 et T014 au vert ; tout écart
+- [x] T015 [US4] Faire passer T013 et T014 au vert ; tout écart
   indique une atteinte à D1 — corriger la passe sans chevrons sans
   toucher la règle chevron
 
@@ -196,19 +196,19 @@ est au vert.
 
 **Purpose**: documentation, contrats et validation de bout en bout.
 
-- [ ] T016 [P] Mettre à jour l'aide du drapeau `--conserver-liens` dans
+- [x] T016 [P] Mettre à jour l'aide du drapeau `--conserver-liens` dans
   `md_cleaner/cli.py` : couvre désormais les destinations avec et sans
   chevrons
-- [ ] T017 [P] Mettre à jour `README.md` : section
+- [x] T017 [P] Mettre à jour `README.md` : section
   `--conserver-liens` étendue aux formes sans chevrons
-- [ ] T018 [P] Réviser
+- [x] T018 [P] Réviser
   `specs/005-nettoyage-liens-absolus/contracts/nettoyage-liens-absolus.md` :
   la borne « formes sans chevrons hors périmètre » devient un renvoi au
   contrat 009
-- [ ] T019 Exécuter la validation de bout en bout
+- [x] T019 Exécuter la validation de bout en bout
   `specs/009-nettoyage-liens-sans-chevrons/quickstart.md` (scénarios 1
   à 5) sur le corpus réel `Examples/Nettoyage-balises/`
-- [ ] T020 Revue finale : `ruff` et `markdownlint` au vert, suite
+- [x] T020 Revue finale : `ruff` et `markdownlint` au vert, suite
   complète `pytest` au vert, aucun diff inattendu dans le dépôt
 
 ---

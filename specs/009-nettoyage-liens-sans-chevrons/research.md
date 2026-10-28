@@ -39,8 +39,10 @@
   les libellés peuvent contenir des crochets équilibrés — `[[1]]` — et le
   remplacement deviendrait un mini-parseur, hors budget small).
 - **Limite documentée** : un alt d'image contenant un crochet fermant
-  (`![a]b](img)`) n'est pas couvert par la regex de protection ; aucune
-  occurrence dans les corpus connus, cas détectable par grep.
+  (`![a]b](img)`) n'est pas couvert par la regex de protection ; la règle
+  lien standard s'applique alors à sa destination (comportement documenté
+  et testé, T011) ; aucune occurrence dans les corpus connus, cas
+  détectable par grep.
 
 ## D3 — Règle sans chevrons : sous-chaîne après crochet fermant, excluant les chevrons
 
@@ -55,7 +57,10 @@
   (titre à guillemet échappé) où la règle chevron ne matche pas. Les
   destinations sans chevrons ne contiennent pas d'espaces en Markdown
   (sinon la forme est `<...>`), ce qui borne la destination au premier
-  espace ou à la parenthèse fermante.
+  espace ou à la parenthèse fermante. Précision ajoutée en TDD : `()`
+  (destination totalement vide) et `]( "titre")` (titre sans
+  destination) ne matchent pas — la destination doit contenir au moins
+  un caractère autre qu'espace et que parenthèse fermante.
 - **Alternatives considered** : autoriser les chevrons dans la nouvelle
   règle (rejeté : double traitement des formes 004/005 et interaction
   avec leurs limites documentées) ; exclure les ancres (rejeté :
@@ -75,7 +80,12 @@
   sont déjà masquées, ce qui la neutralise vis-à-vis des destinations
   d'images ; les deux règles ne peuvent pas interagir ; l'idempotence
   est préservée (après un passage, aucune forme cible ne subsiste, la
-  restauration est exacte, sentinelles sans `](` ni `](<`).
+  restauration est exacte, sentinelles sans `](` ni `](<`). Précision
+  ajoutée en implémentation : le masquage précède aussi la passe
+  chevrons — une image à destination chevrons serait épargnée
+  également (FR-003 prime sur FR-005 pour les images) ; aucune image
+  n'existe dans les corpus historiques, la neutralité testée (T013)
+  est donc inchangée.
 - **Alternatives considered** : passe sans chevrons avant la passe
   chevrons (rejeté : aucun gain, ajoute une interaction possible avec
   les placeholders) ; passes séparées par fichier (rejeté : complexité
