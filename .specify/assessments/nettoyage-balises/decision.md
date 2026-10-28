@@ -8,7 +8,7 @@
 ## Scorecard
 
 | Critère | Note | Justification |
-|-----------|--------|---------------|
+| ----------- | -------- | --------------- |
 | Validité du problème | strong | Mesuré : 199 occurrences, retouche manuelle |
 | Force des preuves | strong | Calibrage exhaustif du corpus, mesures directes |
 | Valeur vs inaction | strong | ~40 retouches par fichier, promesse rompue |
