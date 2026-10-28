@@ -10,23 +10,70 @@ SEUIL_QUASI_VIDE = 0.05
 
 RE_DESTINATION_LIEN = re.compile(r'(?<=\])\(<[^>]*>(?: "[^"]*")?\)')
 
+RE_IMAGE_INLINE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
+
+RE_DESTINATION_SANS_CHEVRONS = re.compile(
+    r'(?<=\])\((?!<)(?=[^)\s])[^)\s]*(?: "[^"]*")?\)'
+)
+
+RE_SENTINELLE_IMAGE = re.compile(r"\x00(\d+)\x00")
+
+
+def _masquer_images(ligne: str, images: list[str]) -> str:
+    """Remplace chaque image par une sentinelle invisible aux passes (009).
+
+    Les sentinelles ne contiennent ni crochet fermant ni parenthèse :
+    les deux règles de destinations leur sont aveugles ; la restauration
+    réintroduit chaque construct à l'identique (FR-003, D2).
+    """
+
+    def remplacer(correspondance) -> str:
+        images.append(correspondance.group(0))
+        return f"\x00{len(images) - 1}\x00"
+
+    return RE_IMAGE_INLINE.sub(remplacer, ligne)
+
+
+def _restaurer_images(ligne: str, images: list[str]) -> str:
+    """Réintroduit chaque image masquée à l'identique (FR-003, D2, D4)."""
+    return RE_SENTINELLE_IMAGE.sub(
+        lambda correspondance: images[int(correspondance.group(1))], ligne
+    )
+
 
 def nettoyer_destinations(lignes: list[str]) -> list[str]:
-    """Retire les destinations de liens inline ](<...>) (FR-001, FR-002, D1, D2).
+    """Retire les destinations de liens inline ](<...>) et ](...) (004/005/009).
 
-    Seule la sous-chaîne (<...>) qui suit le crochet fermant du libellé est
-    retirée, parenthèses et chevrons compris, quel que soit le schéma de la
-    destination (relatif, http, https, mailto, tel, ftp... — règle unifiée
-    sans cas particulier) ; le titre éventuel de la forme ](<url> "titre")
-    est emporté avec la destination, espace et guillemets compris — seuls
-    les libellés survivent ; le libellé [texte] et le reste de la ligne
-    sont inchangés. Le premier > referme la destination (aucun chevron
-    imbriqué) et les caractères encodés sont emportés sans décodage
-    (FR-006). Un titre contenant un guillemet interne échappé (\\") arrête
-    le match avant la parenthèse fermante : la ligne reste inchangée,
-    sans corruption (limite documentée, D2).
+    Deux règles distinctes, sans distinction de schéma (FR-001, D1) :
+    la règle 004/005 cible la sous-chaîne `](<...>)` entre chevrons,
+    titre éventuel emporté (premier `>` refermant, sans décodage) ; la
+    règle 009 cible la sous-chaîne `](...)` sans chevrons qui suit le
+    crochet fermant du libellé — destination sans espace ne commençant
+    pas par `<` (chevrons réservés à la première règle, D3), ancre et
+    destination vide `(#)` couvertes, titre `](url "titre")` emporté
+    avec la destination. Seuls les libellés survivent ; libellés et
+    reste de la ligne sont inchangés (FR-002).
+
+    Les images `![alt](destination)` sont masquées avant les passes et
+    restaurées après : aucune destination d'image n'est retirée ; dans
+    un lien contenant une image, seule la destination du lien externe
+    est retirée (FR-003, D2, D4).
+
+    Limites documentées : un titre contenant un guillemet interne
+    échappé (\\") arrête le match avant la parenthèse fermante, sans
+    corruption (limite 005) ; un alt d'image contenant un crochet
+    fermant n'est pas protégé et la règle lien standard s'applique
+    alors à sa destination (limite 009). La passe est idempotente
+    (FR-008) : aucune forme cible ne subsiste après un passage.
     """
-    return [RE_DESTINATION_LIEN.sub("", ligne) for ligne in lignes]
+    resultat: list[str] = []
+    for ligne in lignes:
+        images: list[str] = []
+        masquee = _masquer_images(ligne, images)
+        nettoyee = RE_DESTINATION_LIEN.sub("", masquee)
+        nettoyee = RE_DESTINATION_SANS_CHEVRONS.sub("", nettoyee)
+        resultat.append(_restaurer_images(nettoyee, images))
+    return resultat
 
 
 @dataclass

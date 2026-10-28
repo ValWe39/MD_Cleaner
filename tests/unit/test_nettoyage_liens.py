@@ -1,12 +1,15 @@
-"""Tests unitaires de la passe de retrait des destinations (T001, T002).
+"""Tests unitaires de la passe de retrait des destinations (004/005/009).
 
 FR-001, FR-002, FR-006, FR-007, D1, D2, D5 : règle unifiée ](<...>) sans
 distinction de schéma (option A), titre retiré avec la destination,
 premier > refermant, sans décodage, libellés et crochets conservés,
 URLs nues et marqueurs de page non matchés, idempotence.
+Feature 009 : extension aux destinations sans chevrons ](...) (ancres,
+relatifs, absolus, titres), images épargnées par protection (D2, D4),
+neutralité des formes chevrons (D1, FR-005).
 """
 
-from md_cleaner.nettoyage import nettoyer_destinations
+from md_cleaner.nettoyage import Bloc, ecrire_nettoye, nettoyer_destinations
 
 
 def test_destination_seule_retiree() -> None:
@@ -35,16 +38,14 @@ def test_caracteres_encodes_non_decodes() -> None:
     assert nettoyer_destinations(["[X](</p?f%5B1%5D=thematic%3A17182>)"]) == ["[X]"]
 
 
-def test_destination_absolue_intacte() -> None:
-    """Hors périmètre : ](https://...) n'est pas retirée."""
-    ligne = "[X](https://exemple.fr/page)"
-    assert nettoyer_destinations([ligne]) == [ligne]
+def test_destination_absolue_retiree() -> None:
+    """FR-001 (009) : ](https://...) sans chevrons retirée, libellé conservé."""
+    assert nettoyer_destinations(["[X](https://exemple.fr/page)"]) == ["[X]"]
 
 
-def test_destination_nue_intacte() -> None:
-    """Hors périmètre : ](chemin) sans chevrons n'est pas retirée."""
-    ligne = "[X](chemin/relatif)"
-    assert nettoyer_destinations([ligne]) == [ligne]
+def test_destination_relative_sans_chevrons_retiree() -> None:
+    """FR-001 (009) : ](chemin/relatif) sans chevrons retirée."""
+    assert nettoyer_destinations(["[X](chemin/relatif)"]) == ["[X]"]
 
 
 def test_chevron_non_referme_intact() -> None:
@@ -155,3 +156,116 @@ def test_titre_sans_destination_intact() -> None:
     """Cas limite (T002) : ]( "titre") sans chevrons ne matche pas."""
     ligne = '[A]( "titre") fin'
     assert nettoyer_destinations([ligne]) == [ligne]
+
+
+# --- Feature 009 : destinations sans chevrons ---
+
+
+def test_ancre_retiree() -> None:
+    """FR-001 (009, T004) : ](#haut) retirée, libellé conservé."""
+    assert nettoyer_destinations(["[Revenir en haut de page](#haut)"]) == [
+        "[Revenir en haut de page]"
+    ]
+
+
+def test_ancre_vide_retiree() -> None:
+    """Cas limite (009, T004) : ](#) retirée."""
+    assert nettoyer_destinations(["[Ressources](#)"]) == ["[Ressources]"]
+
+
+def test_relatif_racine_retire() -> None:
+    """FR-001 (009, T004) : ](/commentaire/...) retirée sans décodage."""
+    assert nettoyer_destinations(
+        ["[Lire →](/commentaire/Le%20patrimoine%20des%20...%20fin%202025)"]
+    ) == ["[Lire →]"]
+
+
+def test_relatif_sans_slash_retire() -> None:
+    """FR-001 (009, T004) : ](Les-crédits-dimp...) retirée, libellé avec
+    ses crochets et son italique conservés (comportement 004/005)."""
+    assert nettoyer_destinations(
+        ["« [*crédit d'impôt*](Les-crédits-dimp%C3%B4t) »"]
+    ) == ["« [*crédit d'impôt*] »"]
+
+
+def test_plusieurs_liens_sans_chevrons_sur_une_ligne() -> None:
+    """US1 scénario (009, T004) : chaque occurrence retirée, ordre conservé."""
+    assert nettoyer_destinations(["[A](/a) et [B](https://b.fr)"]) == ["[A] et [B]"]
+
+
+def test_note_de_bas_de_page() -> None:
+    """Cas limite (009, T004) : ](#_ftn1) retirée, [[1]] conservé (D7)."""
+    assert nettoyer_destinations(["en comptabilité nationale[[1]](#_ftn1)."]) == [
+        "en comptabilité nationale[[1]]."
+    ]
+
+
+def test_titre_sans_chevrons_emporte() -> None:
+    """FR-007 (009, T004) : destination et titre retirés (arbitrage 005)."""
+    assert nettoyer_destinations(['[A](https://exemple.fr "titre")']) == ["[A]"]
+
+
+def test_destination_vide_sans_titre_intacte() -> None:
+    """Cas limite (009, T004) : ]() et ]( "titre") ne matchent pas."""
+    assert nettoyer_destinations(["[A]() fin"]) == ["[A]() fin"]
+    assert nettoyer_destinations(['[A]( "titre") fin']) == ['[A]( "titre") fin']
+
+
+def test_ligne_entierement_constituee_dun_lien_sans_chevrons() -> None:
+    """Précédent 004 (009, T004) : ligne conservée, libellé seul."""
+    assert nettoyer_destinations(["[Libellé](/chemin)"]) == ["[Libellé]"]
+
+
+def test_idempotence_sans_chevrons() -> None:
+    """FR-008 (009, T004) : deux passes = une passe sur les deux règles."""
+    lignes = ["[A](/a) et [B](https://b.fr) fin"]
+    une = nettoyer_destinations(lignes)
+    assert nettoyer_destinations(une) == une
+
+
+def test_conserver_liens_desactive_les_deux_regles(tmp_path) -> None:
+    """FR-004 (009, T008) : le drapeau laisse intactes les deux formes."""
+    bloc = Bloc("P1-B1", 1, ["[A](</a>) [B](/b)"], 0, 0)
+    chemin = tmp_path / "sortie.md"
+    ecrire_nettoye(chemin, [bloc], conserver_liens=True)
+    assert chemin.read_text(encoding="utf-8") == "[A](</a>) [B](/b)\n"
+    ecrire_nettoye(chemin, [bloc], conserver_liens=False)
+    assert chemin.read_text(encoding="utf-8") == "[A] [B]\n"
+
+
+def test_image_simple_intacte() -> None:
+    """FR-003 (009, T011) : figure épargnée, destination comprise."""
+    ligne = "![](/images/FIV11a.png)Sources : rapports annexés."
+    assert nettoyer_destinations([ligne]) == [ligne]
+
+
+def test_logo_imbrique_reduit_a_image() -> None:
+    """FR-003, D7 (009, T011) : destination externe retirée, image conservée."""
+    assert nettoyer_destinations(["[![FIPECO](/images/logo.jpg)](/)"]) == [
+        "[![FIPECO](/images/logo.jpg)]"
+    ]
+
+
+def test_image_alt_avec_crochet_fermant_non_protegee() -> None:
+    """Limite D2 (009, T011) : construct non protégé, la règle lien
+    standard s'applique à la sous-chaîne suivant le crochet fermant."""
+    assert nettoyer_destinations(["![a]b](/img) fin"]) == ["![a]b] fin"]
+
+
+def test_image_au_milieu_de_liens() -> None:
+    """FR-003 (009, T011) : image intacte entre des liens nettoyés."""
+    lignes = ["[A](/a) ![](/img.png) [B](https://b.fr)"]
+    assert nettoyer_destinations(lignes) == ["[A] ![](/img.png) [B]"]
+
+
+def test_formes_chevrons_inchangees_par_la_regle_009() -> None:
+    """FR-005 (009, T014) : les formes ](<...>) gardent le traitement 004/005."""
+    ligne = '[A](</a>) et [B](<https://b.fr> "t") fin'
+    assert nettoyer_destinations([ligne]) == ["[A] et [B] fin"]
+
+
+def test_idempotence_mixte() -> None:
+    """FR-008 (009, T014) : idempotence sur les deux formes et une image."""
+    lignes = ["[A](</a>) [B](/b) ![](/img.png)"]
+    une = nettoyer_destinations(lignes)
+    assert nettoyer_destinations(une) == une

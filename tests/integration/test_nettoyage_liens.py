@@ -1,21 +1,28 @@
-"""Tests d'intégration features 004/005 : destinations de liens (T002-T005).
+"""Tests d'intégration features 004/005/009 : destinations de liens.
 
 SC-001 à SC-005, FR-003 à FR-005, FR-007 : run standard sans destination
 résiduelle (relatives et absolues), --conserver-liens réversible octet par
 octet, garde-fou des URLs nues (corps du texte, blocs de code), neutralité
 sur corpus sans liens absolus conservés, sortie paginée nettoyée avec
 marqueurs et cartographie intacts, dry-run non affecté.
+Feature 009 : corpus de calibration `Examples/Nettoyage-balises/`
+(0 destination sans chevrons, libellés et images intacts) et neutralité
+des corpus historiques.
 """
 
 import re
 from pathlib import Path
 
+import pytest
+
 from md_cleaner.cli import CODE_OK, main
+from md_cleaner.normalisation import nom_sortie_nettoye
 
 RACINE = Path(__file__).parents[2]
 EXEMPLE_1 = RACINE / "Examples" / "Exemple_1" / "2.Input" / "consolidated.md"
 EXEMPLE_2 = RACINE / "Examples" / "Exemple_2" / "2.Input" / "consolidated.md"
 EXEMPLE_3 = RACINE / "Examples" / "Exemple_3" / "2.Input" / "retry-failed-records.md"
+CORPUS_BALISES = RACINE / "Examples" / "Nettoyage-balises"
 
 # Règle unifiée de la feature 005 : toute destination ](<...>), titre éventuel
 # compris (contracts/nettoyage-liens-absolus.md).
@@ -25,6 +32,10 @@ _RE_DESTINATION = re.compile(r'(?<=\])\(<[^>]*>(?: "[^"]*")?\)')
 # aucune destination absolue ne survit à la détection, les deux règles
 # produisent le même résultat).
 _RE_RELATIVE_004 = re.compile(r"(?<=\])\(</[^>]*>\)")
+
+# Règle de la feature 009 : destination ](...) sans chevrons après un
+# crochet fermant, titre éventuel compris (contracts 009).
+_RE_SANS_CHEVRONS = re.compile(r'(?<=\])\((?!<)(?=[^)\s])[^)\s]*(?: "[^"]*")?\)')
 
 
 def _corpus_sans_liens(tmp_path) -> Path:
@@ -256,3 +267,81 @@ def test_dry_run_inchange_par_la_passe(tmp_path) -> None:
         )
         rapports[mode] = texte.replace(str(tmp_path / mode), "<sortie>")
     assert rapports["actif"] == rapports["brut"]
+
+
+# --- Feature 009 : destinations sans chevrons (corpus de calibration) ---
+
+_OCURRENCES = {
+    "fipeco.fr-000033-nettoye.md": 46,
+    "fipeco.fr-000034-nettoye.md": 38,
+    "fipeco.fr-000035-nettoye.md": 40,
+    "fipeco.fr-000036-nettoye.md": 46,
+    "fipeco.fr-000037-nettoye.md": 48,
+}
+
+_CORPUS_PRESENT = CORPUS_BALISES.is_dir() and all(
+    (CORPUS_BALISES / nom).is_file() for nom in _OCURRENCES
+)
+
+# Images épargnées par la règle 009 (FR-003) : exclues de la détection de
+# résidus pour ne compter que les destinations de liens.
+_RE_IMAGE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
+
+
+def _residus_sans_chevrons(texte: str) -> list[str]:
+    """Destinations de liens sans chevrons résiduelles, images exclues."""
+    return _RE_SANS_CHEVRONS.findall(_RE_IMAGE.sub("", texte))
+
+
+def _sortie_nettoye(dossier, fichier: Path) -> Path:
+    """Chemin du nettoyé dérivé de l'entrée (006) dans le run 001."""
+    return dossier / "001" / f"{nom_sortie_nettoye(fichier.stem)}.md"
+
+
+@pytest.mark.skipif(not _CORPUS_PRESENT, reason="corpus Nettoyage-balises absent")
+def test_corpus_balises_sans_destinations_sans_chevrons(tmp_path) -> None:
+    """SC-001, SC-002 (009, T005) : 0 destination sans chevrons en sortie,
+    libellés et images intacts, nombre d'occurrences conforme à la baseline."""
+    for nom, attendu in _OCURRENCES.items():
+        fichier = CORPUS_BALISES / nom
+        entree = fichier.read_text(encoding="utf-8")
+        assert len(_residus_sans_chevrons(entree)) == attendu
+        dossier = tmp_path / fichier.stem
+        assert main([str(fichier), "--sortie", str(dossier)]) == CODE_OK
+        sortie = _sortie_nettoye(dossier, fichier).read_text(encoding="utf-8")
+        assert not _residus_sans_chevrons(sortie)
+    fiche33 = _sortie_nettoye(
+        tmp_path / "fipeco.fr-000033-nettoye",
+        CORPUS_BALISES / "fipeco.fr-000033-nettoye.md",
+    )
+    sortie = fiche33.read_text(encoding="utf-8")
+    assert "[Lire →]" in sortie
+    assert "[Revenir en haut de page]" in sortie
+    assert "![](/images/FIV11a.png)" in sortie
+    assert "[![FIPECO](/images/logo_legacy.jpg)]" in sortie
+
+
+@pytest.mark.skipif(not _CORPUS_PRESENT, reason="corpus Nettoyage-balises absent")
+def test_corpus_balises_conserver_liens_intact(tmp_path) -> None:
+    """FR-004 (009, T009) : avec le drapeau, destinations sans chevrons
+    intactes ; le run par défaut les retire."""
+    fichier = CORPUS_BALISES / "fipeco.fr-000033-nettoye.md"
+    assert (
+        main([str(fichier), "--conserver-liens", "--sortie", str(tmp_path / "brut")])
+        == CODE_OK
+    )
+    brut = _sortie_nettoye(tmp_path / "brut", fichier).read_text(encoding="utf-8")
+    assert "[Lire →](/commentaire/Le%20patrimoine" in brut
+    assert _residus_sans_chevrons(brut)
+    assert main([str(fichier), "--sortie", str(tmp_path / "defaut")]) == CODE_OK
+    propre = _sortie_nettoye(tmp_path / "defaut", fichier).read_text(encoding="utf-8")
+    assert not _residus_sans_chevrons(propre)
+    assert "[Lire →](/commentaire/Le%20patrimoine" not in propre
+
+
+def test_exemple_3_neutre_sur_les_formes_sans_chevrons(tmp_path) -> None:
+    """SC-003 (009, T013) : aucune destination sans chevrons dans les
+    entrées historiques, sorties du run par défaut sans chevrons aussi."""
+    assert main([str(EXEMPLE_3), "--sortie", str(tmp_path)]) == CODE_OK
+    nettoye = _nettoye(tmp_path, nom="retry-failed-records-nettoye.md")
+    assert not _residus_sans_chevrons(nettoye)
