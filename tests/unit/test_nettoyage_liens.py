@@ -269,3 +269,89 @@ def test_idempotence_mixte() -> None:
     lignes = ["[A](</a>) [B](/b) ![](/img.png)"]
     une = nettoyer_destinations(lignes)
     assert nettoyer_destinations(une) == une
+
+
+# --- Bug nettoyage-balises2 : footnotes à titre échappé, espaces ---
+
+
+def test_footnote_titre_echappe_emporte() -> None:
+    """Bug nettoyage-balises2 : destination, titre et HTML embarqué
+    (guillemets échappés) emportés ensemble, libellé conservé."""
+    ligne = (
+        "…politique des politiques [1](#easy-footnote-bottom-1-138905 "
+        '"Emmanuel Macron, <a href=\\"https://avecvous.fr/publications/'
+        'emmanuel-macron-avec-vous-a-marseille\\">Discours au Pharo</a>, '
+        '16 avril 2022"). Le Président…'
+    )
+    assert nettoyer_destinations([ligne]) == [
+        "…politique des politiques [1]. Le Président…"
+    ]
+
+
+def test_destination_avec_espaces_retiree() -> None:
+    """Bug nettoyage-balises2 : destination non encodée avec espaces
+    retirée quand aucun titre ne suit (Markdown invalide du convertisseur)."""
+    assert nettoyer_destinations(
+        ["[Histoire en images](https://exemple.fr/fr/Histoire en images)"]
+    ) == ["[Histoire en images]"]
+
+
+def test_destination_espaces_avec_titre_intacte() -> None:
+    """Limite documentée (bug nettoyage-balises2) : destination à espaces
+    suivie d'un titre — non couverte, ligne inchangée sans corruption."""
+    ligne = '[A](chemin relatif "titre") fin'
+    assert nettoyer_destinations([ligne]) == [ligne]
+
+
+def test_footnote_et_image_sur_la_meme_ligne() -> None:
+    """Bug nettoyage-balises2 : footnote emportée, image épargnée sur la
+    même ligne (FR-003)."""
+    ligne = (
+        "Texte ![](/images/figure.jpg) puis [2](#easy-footnote-bottom-2-1 "
+        '"<a href=\\"https://exemple.fr/rapport\\">Rapport</a>") suite'
+    )
+    assert nettoyer_destinations([ligne]) == [
+        "Texte ![](/images/figure.jpg) puis [2] suite"
+    ]
+
+
+def test_idempotence_formes_bug() -> None:
+    """FR-008 (bug nettoyage-balises2) : deux passes = une passe."""
+    lignes = [
+        '[A](/a) [B](https://exemple.fr/x y) [C](#ancre "titre \\"echappe\\"") fin'
+    ]
+    une = nettoyer_destinations(lignes)
+    assert nettoyer_destinations(une) == une
+
+
+def test_autolink_retire() -> None:
+    """Quick fix 2026-10-27 : l'autolink <https://...> est retiré,
+    sans libellé ni crochet — la référence devient vide (l'espace
+    résiduel est décapé par le writer, cf. _compacter)."""
+    ligne = (
+        "13. <https://www.eea.europa.eu/data-and-maps/dashboards"
+        "/emissions-trading-viewer-1>"
+    )
+    assert nettoyer_destinations([ligne]) == ["13. "]
+
+
+def test_autolink_chevron_limite_non_corrompu() -> None:
+    """Limite 004/005 préservée : une destination chevron dont le
+    titre échoue (guillemets échappés) reste en place — l'autolink
+    interne n'est pas retiré, aucune corruption."""
+    ligne = '[A](<https://exemple.fr> "titre " interne") fin'
+    assert nettoyer_destinations([ligne]) == [ligne]
+
+
+def test_autolink_image_protegee() -> None:
+    """FR-003 : une image à destination chevron est épargnée,
+    l'autolink ne touche pas sa destination protégée."""
+    ligne = "![](<https://exemple.fr/img.png>) légende"
+    assert nettoyer_destinations([ligne]) == [ligne]
+
+
+def test_url_nue_et_autolink_distincts() -> None:
+    """Garde-fou 005 : URL nue intacte, autolink retiré — les deux
+    formes cohabitent sans confusion."""
+    lignes = ["voir https://exemple.fr/a puis <https://exemple.fr/b> fin"]
+    assert nettoyer_destinations(lignes) == ["voir https://exemple.fr/a puis  fin"]

@@ -35,7 +35,10 @@ _RE_RELATIVE_004 = re.compile(r"(?<=\])\(</[^>]*>\)")
 
 # Règle de la feature 009 : destination ](...) sans chevrons après un
 # crochet fermant, titre éventuel compris (contracts 009).
-_RE_SANS_CHEVRONS = re.compile(r'(?<=\])\((?!<)(?=[^)\s])[^)\s]*(?: "[^"]*")?\)')
+_RE_SANS_CHEVRONS = re.compile(
+    r"(?<=\])\((?!<)(?=[^)\s])"
+    r'(?:[^)\s]*(?: "(?:[^"\\]|\\.)*")?|[^)"]*)\)'
+)
 
 
 def _corpus_sans_liens(tmp_path) -> Path:
@@ -274,7 +277,7 @@ def test_dry_run_inchange_par_la_passe(tmp_path) -> None:
 _OCURRENCES = {
     "fipeco.fr-000033-nettoye.md": 46,
     "fipeco.fr-000034-nettoye.md": 38,
-    "fipeco.fr-000035-nettoye.md": 40,
+    "fipeco.fr-000035-nettoye.md": 41,
     "fipeco.fr-000036-nettoye.md": 46,
     "fipeco.fr-000037-nettoye.md": 48,
 }
@@ -345,3 +348,35 @@ def test_exemple_3_neutre_sur_les_formes_sans_chevrons(tmp_path) -> None:
     assert main([str(EXEMPLE_3), "--sortie", str(tmp_path)]) == CODE_OK
     nettoye = _nettoye(tmp_path, nom="retry-failed-records-nettoye.md")
     assert not _residus_sans_chevrons(nettoye)
+
+
+# --- Bug nettoyage-balises2 : corpus Le Grand Continent ---
+
+CORPUS_BALISES2 = RACINE / "Examples" / "Nettoyage-balises2"
+_FOOTNOTES_LGC = {
+    "legrandcontinent.eu--nettoye.md": 24,
+    "legrandcontinent.eu--nettoye-1.md": 9,
+}
+
+_CORPUS2_PRESENT = CORPUS_BALISES2.is_dir() and all(
+    (CORPUS_BALISES2 / nom).is_file() for nom in _FOOTNOTES_LGC
+)
+
+
+@pytest.mark.skipif(not _CORPUS2_PRESENT, reason="corpus Nettoyage-balises2 absent")
+def test_corpus_lgc_footnotes_et_espaces_nettoyes(tmp_path) -> None:
+    """Bug nettoyage-balises2 : 0 footnote résiduelle, destination à
+    espaces retirée, images épargnées, libellés [N] conservés."""
+    for nom, attendu in _FOOTNOTES_LGC.items():
+        fichier = CORPUS_BALISES2 / nom
+        entree = fichier.read_text(encoding="utf-8")
+        assert len(_RE_SANS_CHEVRONS.findall(_RE_IMAGE.sub("", entree))) >= attendu
+        dossier = tmp_path / fichier.stem
+        assert main([str(fichier), "--sortie", str(dossier)]) == CODE_OK
+        sortie = _sortie_nettoye(dossier, fichier).read_text(encoding="utf-8")
+        assert "easy-footnote" not in sortie
+        assert "<https" not in sortie
+        assert "](https://legrandcontinent.eu/fr/Histoire en images)" not in sortie
+        assert "[Histoire en images]" in sortie
+        assert "![](https://legrandcontinent.eu/fr/wp-content/" in sortie
+        assert "[1]" in sortie

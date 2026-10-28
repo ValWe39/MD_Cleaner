@@ -13,8 +13,11 @@ RE_DESTINATION_LIEN = re.compile(r'(?<=\])\(<[^>]*>(?: "[^"]*")?\)')
 RE_IMAGE_INLINE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 
 RE_DESTINATION_SANS_CHEVRONS = re.compile(
-    r'(?<=\])\((?!<)(?=[^)\s])[^)\s]*(?: "[^"]*")?\)'
+    r"(?<=\])\((?!<)(?=[^)\s])"
+    r'(?:[^)\s]*(?: "(?:[^"\\]|\\.)*")?|[^)"]*)\)'
 )
+
+RE_AUTO_LIEN = re.compile(r"(?<!\()<https?://[^>\s]+>")
 
 RE_SENTINELLE_IMAGE = re.compile(r"\x00(\d+)\x00")
 
@@ -48,23 +51,33 @@ def nettoyer_destinations(lignes: list[str]) -> list[str]:
     la règle 004/005 cible la sous-chaîne `](<...>)` entre chevrons,
     titre éventuel emporté (premier `>` refermant, sans décodage) ; la
     règle 009 cible la sous-chaîne `](...)` sans chevrons qui suit le
-    crochet fermant du libellé — destination sans espace ne commençant
-    pas par `<` (chevrons réservés à la première règle, D3), ancre et
-    destination vide `(#)` couvertes, titre `](url "titre")` emporté
-    avec la destination. Seuls les libellés survivent ; libellés et
-    reste de la ligne sont inchangés (FR-002).
+    crochet fermant du libellé — destination ne commençant pas par `<`
+    (chevrons réservés à la première règle, D3), ancre et destination
+    vide `(#)` couvertes, titre `](url "titre")` emporté avec la
+    destination, y compris les titres à guillemets internes échappés
+    (`\"`, forme footnote du bug nettoyage-balises2), et destinations
+    contenant des espaces tant qu'aucun titre ne suit (convertisseurs
+    produisant du Markdown invalide non encodé). Seuls les libellés
+    survivent ; libellés et reste de la ligne sont inchangés
+    (FR-002).
 
     Les images `![alt](destination)` sont masquées avant les passes et
     restaurées après : aucune destination d'image n'est retirée ; dans
     un lien contenant une image, seule la destination du lien externe
-    est retirée (FR-003, D2, D4).
+    est retirée (FR-003, D2, D4). Les autolinks `<https://...>` (sans
+    crochet fermant, arbitrage quick fix du 2026-10-27) sont retirés,
+    sauf ceux précédés d'une parenthèse ouvrante — destinations
+    chevrons dont le titre à guillemets échappés échoue (limite
+    004/005, laissées en place sans corruption).
 
-    Limites documentées : un titre contenant un guillemet interne
-    échappé (\\") arrête le match avant la parenthèse fermante, sans
-    corruption (limite 005) ; un alt d'image contenant un crochet
-    fermant n'est pas protégé et la règle lien standard s'applique
-    alors à sa destination (limite 009). La passe est idempotente
-    (FR-008) : aucune forme cible ne subsiste après un passage.
+    Limites documentées : un titre à guillemet interne échappé arrête
+    toujours le match de la règle chevron 004/005 (limite héritée,
+    FR-005) ; une destination avec espaces suivie d'un titre
+    (`](a b "t")`) n'est pas couverte par la règle sans chevrons ;
+    un alt d'image contenant un crochet fermant n'est pas protégé et
+    la règle lien standard s'applique alors à sa destination (limite
+    009). La passe est idempotente (FR-008) : aucune forme cible ne
+    subsiste après un passage.
     """
     resultat: list[str] = []
     for ligne in lignes:
@@ -72,6 +85,7 @@ def nettoyer_destinations(lignes: list[str]) -> list[str]:
         masquee = _masquer_images(ligne, images)
         nettoyee = RE_DESTINATION_LIEN.sub("", masquee)
         nettoyee = RE_DESTINATION_SANS_CHEVRONS.sub("", nettoyee)
+        nettoyee = RE_AUTO_LIEN.sub("", nettoyee)
         resultat.append(_restaurer_images(nettoyee, images))
     return resultat
 

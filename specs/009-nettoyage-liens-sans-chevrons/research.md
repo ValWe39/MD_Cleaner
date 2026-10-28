@@ -70,6 +70,15 @@
   échappé (`\"`) arrête le match avant la parenthèse fermante — la
   destination reste en place, sans corruption (limite héritée de 005) ;
   0 occurrence dans le corpus de calibration.
+- **Amendement (bug nettoyage-balises2, 2026-10-27)** : la règle
+  couvre désormais les titres à guillemets internes échappés — forme
+  footnote du corpus Le Grand Continent, où le titre embarque du HTML
+  brut (`<a href=\"https://...\">…</a>`) portant la quasi-totalité des
+  URLs résiduelles — et les destinations contenant des espaces tant
+  qu'aucun titre ne suit (Markdown invalide produit par les
+  convertisseurs) ; la limite reste pour la règle chevron 004/005
+  (FR-005, arbitrage : chevron inchangé) et pour une destination à
+  espaces suivie d'un titre.
 
 ## D4 — Ordre d'application : protection, chevrons, sans chevrons, restauration
 

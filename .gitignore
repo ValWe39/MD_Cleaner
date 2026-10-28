@@ -15,6 +15,7 @@ Examples/
 .specify/*
 !.specify/memory/
 !.specify/assessments/
+!.specify/bugs/
 .specify/memory/.*
 
 # Python (artefacts locaux)
